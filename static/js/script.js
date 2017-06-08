@@ -181,8 +181,8 @@ function submitWizardResponse() {
 };
 
 $(document).ready(function() {
-    var buttonadd = '<span><button class="btn btn-success btn-add" type="button"><span class="glyphicon glyphicon-plus"></span></button></span>';
-    var fvrhtmlclone = '<div class="fvrclonned">' + $(".fvrduplicate").html() + buttonadd + '</div>';
+    var buttonadd = '<div class="col-xs-2" style="padding: 0;"><button class="btn btn-success btn-add" type="button"><div class="glyphicon glyphicon-plus"></button></div>';
+    var fvrhtmlclone = '<div class="fvrclonned col-xs-12">' + $(".fvrduplicate").html() + buttonadd + '</div>';
     $(".fvrduplicate").html(fvrhtmlclone);
     $(".fvrduplicate").after('<div class="fvrclone"></div>');
 
@@ -209,12 +209,13 @@ $(document).ready(function() {
 
     $("#AddDiaact").click(function () {
         console.log("addnewact")
+
         if (counter > 10) {
             alert("Only 10 textboxes allow");
             return false;
         }
-
-        var newDiaactDiv = "<div class='form-group form-inline dup' id='diaact-" + counter + "'>" + baseHtml + "</div>"
+        var index = counter
+        var newDiaactDiv = "<div class='form-group row dup' id='diaact-" + index + "'>" + baseHtml + "</div>"
 
         //var newTextBoxDiv = $(document.createElement('div'))
          //   .attr("id", 'TextBoxDiv' + counter);
@@ -227,17 +228,20 @@ $(document).ready(function() {
         $('.diaact').append(newDiaactDiv)
 
         counter++;
+        console.log("now we have " + counter)
     });
 
     $("#RemoveDiaact").click(function () {
+        console.log(counter)
         if (counter == 0) {
             alert("No more dialogue act to remove");
             return false;
         }
 
-        console.log(counter)
+        var idx = counter - 1
+        console.log("removing " + idx)
+        $("#diaact-" + idx).remove();
         counter--;
-        $("#diaact-" + counter).remove();
 
     });
     $("#getButtonValue").click(function () {
