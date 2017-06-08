@@ -265,7 +265,7 @@ def newWizardTask():
     #result = dbutil.taskdb.update({"taskId": taskId}, {"$set": {
     #dbutil.STATUS: dbutil.WW
     #}})
-    print prevAreaName
+
     return render_template('wizard.html', taskId=taskId, sents = sents, prevFoodType = prevFoodType, prevAreaName = prevAreaName, prevUpperBound = prevUpperBound, prevLowerBound = prevLowerBound)
 
 def createDefaultDS():
@@ -288,7 +288,6 @@ def searchDB():
     area = content[dbutil.AREA]
     name = content[dbutil.NAME]
     foodType = content[dbutil.FOOD_TYPE]
-    print content
 
     priceLowerBound = -1
     priceUpperBound = -1
@@ -330,13 +329,13 @@ def searchDB():
 
     #newDS = foodType + "," + area + "," + str(priceLowerBound) + "," + str(priceUpperBound) + "," + str(askFoodType) + "," + str(askArea) + "," + str(askPrice)
     while len(curDS) < len(userUtc):
-        print "DS len: {}, userUtc len: {}".format(str(len(curDS)), str(len(userUtc)))
+        #print "DS len: {}, userUtc len: {}".format(str(len(curDS)), str(len(userUtc)))
         curDS.append({"error": createDefaultDS()})
     if idx >= 0:
         newDS[dbutil.USER_UTC] = userUtc[idx]
     curDS[idx] = newDS
     task[dbutil.DIA_STATE] = curDS
-    print task[dbutil.DIA_STATE]
+    #print task[dbutil.DIA_STATE]
     dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
     dbutil.taskdb.insert(task)
 
@@ -351,7 +350,6 @@ def searchDB():
         key[dbutil.PRICE] = {'$gt':  priceLowerBound, '$lt': priceUpperBound}
     if len(name) != 0:
         name2 = name.split("(")
-        print name2[0]
         key[dbutil.NAME] = {'$regex': '.*' + name2[0] + '.*'}
     app.logger.info("User %s search key: %s", user_name, key)
 
@@ -379,7 +377,7 @@ def wizardUpdateTask():
         wizardResponse = content['wizard_response']
         #sysDiaAct = content[dbutil.SYS_DIA_ACT]
         sysSlotInfo = content[dbutil.SYS_SLOT_INFO]
-        print sysSlotInfo
+        #print sysSlotInfo
         #print wizardResponse
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
 
@@ -396,7 +394,7 @@ def wizardUpdateTask():
 
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
-        print "returning"
+        #print "returning"
         return json.dumps({'status':'OK','task_id': taskId, 'wizard_response': wizardResponse, 'sys_slot_info': sysSlotInfo})
 
 def initDb_v0():
