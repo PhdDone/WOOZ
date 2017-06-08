@@ -109,30 +109,24 @@ function searchDB() {
 function submitWizardResponse() {
     var taskId = $('#taskId').text();
     var wizardResponse = $('#wizardResponse').val();
-    var sysAct = $('#sysAct').val()
-    console.log(sysAct)
+
     var end = $('#endOfDialogue').prop('checked')
 
-
-    var sysSlotNames = $(".sysSlotName").map(function () {
-        return $(this).val();
-    }).get();
-
-    var sysSlotValues = $(".sysSlotValue").map(function () {
-        return $(this).val();
-    }).get();
-
-    console.log("end: " + end)
-
     var allSlots = []
-    for (var i = 0; i < 10; ++i) {
+    for (i = 0; i < 8; ++i) {
         console.log("counter:" + i)
         var x = $('#diaact-' + i)
-
-        if ( x.length === 0){
+        //if ( x.length === 0 ){
+        //    break
+        //}
+        console.log(x)
+        var sysAct =  $('#diaact-' + i).find('.sysAct').val()
+        if (!sysAct || sysAct.length === 0) {
             break
         }
-        console.log(x)
+
+        sysAct = sysAct.replace(/[^a-z]/gi, '');
+
         var sysSlotNames = $('#diaact-' + i).find('.sysSlotName').map(function () {
             return $(this).val();
         }).get();
@@ -140,29 +134,28 @@ function submitWizardResponse() {
         var sysSlotValues = $('#diaact-' + i).find('.sysSlotValue').map(function () {
             return $(this).val();
         }).get();
-        console.log(i)
-        console.log(sysSlotNames)
-        console.log(sysSlotValues)
+        console.log("find: #diaact-" + i)
         var slotInfo = {}
-
-        for (var i = 0; i < sysSlotNames.length; ++i) {
-            var name = sysSlotNames[i]
+        slotInfo["sys_act"] = sysAct
+        for (j = 0; j < sysSlotNames.length; ++j) {
+            var name = sysSlotNames[j]
             if (name.includes("-")) {
                 continue
             }
             var slotName = name.split(" ")[1]
-            var slotValue = sysSlotValues[i]
+            var slotValue = sysSlotValues[j]
             if (!slotValue) {
                 slotValue = "UNK"
             }
             slotInfo[slotName] = slotValue
-            console.log(slotInfo)
         }
         allSlots.push(slotInfo)
     }
 
-    for (var i = 0; i < allSlots.length; ++i)
-        console.log(allSlots[i])
+    //for (var i = 0; i < allSlots.length; ++i) {
+    //    console.log(allSlots[i])
+    //}
+
 
     $.ajax({
         type: 'POST',

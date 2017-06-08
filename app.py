@@ -377,7 +377,7 @@ def wizardUpdateTask():
         #print content
         taskId = content[dbutil.TASK_ID]
         wizardResponse = content['wizard_response']
-        sysDiaAct = content[dbutil.SYS_DIA_ACT]
+        #sysDiaAct = content[dbutil.SYS_DIA_ACT]
         sysSlotInfo = content[dbutil.SYS_SLOT_INFO]
         print sysSlotInfo
         #print wizardResponse
@@ -388,7 +388,8 @@ def wizardUpdateTask():
         task[dbutil.SYS_UTC].append("Sys: " + wizardResponse)
         task[dbutil.STATUS] = dbutil.UT
         #print task
-        task[dbutil.DIA_ACT].append({dbutil.SYS_DIA_ACT : sysDiaAct, dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
+        #task[dbutil.DIA_ACT].append({dbutil.SYS_DIA_ACT : sysDiaAct, dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
+        task[dbutil.DIA_ACT].append({dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
         end = content["end"]
         if end:
             task[dbutil.STATUS] = dbutil.FT
@@ -396,7 +397,7 @@ def wizardUpdateTask():
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
         print "returning"
-        return json.dumps({'status':'OK','task_id': taskId, 'wizard_response': wizardResponse})
+        return json.dumps({'status':'OK','task_id': taskId, 'wizard_response': wizardResponse, 'sys_slot_info': sysSlotInfo})
 
 def initDb_v0():
     #task schema:

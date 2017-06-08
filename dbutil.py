@@ -225,7 +225,7 @@ def loadTask():
 
     import re
     p = re.compile('\{(.*?)\}')
-    File = "./data/task.test"
+    File = "./data/sampled.task.smoothed.500"
     file = open(File, "r")
     taskID = 1
     for line in file.readlines():
