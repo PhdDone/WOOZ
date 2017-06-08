@@ -1,5 +1,3 @@
-
-
 function submitUserResponse() {
     var taskId = $('#taskId').text();
     var userResponse = $('#userResponse').val();
@@ -26,9 +24,6 @@ function submitUserResponse() {
 };
 
 function searchDB() {
-    wizardClickedFinish = true
-    console.log("searchdb")
-    console.log(wizardClickedFinish)
     var taskId = $('#taskId').text();
     var name = $('#name').val();
     var area = $('#area').val();
@@ -252,11 +247,6 @@ $(document).ready(function() {
         $("#diaact-" + counter).remove();
 
     });
-
-    $("#wizardSubmit").submit(function () {
-        console.log("%%%")
-        submitWizardResponse()
-    })
     $("#getButtonValue").click(function () {
 
         for (var i = 0; i < counter; ++i) {
