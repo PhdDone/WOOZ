@@ -85,7 +85,7 @@ def newTask():
 
     sample = random.uniform(0, 1)
     app.logger.info("have user task: %s, have wizard task: %s, sample prob: %.2f", dbutil.haveUserTask(), dbutil.haveWizardTask(), sample)
-    if (dbutil.haveUserTask() or dbutil.haveWizardTask()) and sample >= 0.1:
+    if (dbutil.haveUserTask() or dbutil.haveWizardTask()) and sample > 0.2:
         if dbutil.haveWizardTask():
             return newWizardTask()
         else:
