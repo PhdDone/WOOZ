@@ -359,6 +359,15 @@ def searchDB():
         sortedlist = sortedlist[0:200]
     return json.dumps(sortedlist)
 
+@app.route('/updateTask', methods=['GET','POST'])
+def updateTask():
+    if request.method == "POST":
+        #print request
+        content = request.get_json()
+        print content
+    else:
+        return render_template("updateTask.html")
+
 @app.route('/wizardUpdateTask', methods=['POST'])
 def wizardUpdateTask():
     user_name = request.cookies.get('UserName')
@@ -428,7 +437,6 @@ def initDb_v0():
         dbutil.restaurantdb.insert(res1)
         dbutil.restaurantdb.insert(res2)
         dbutil.restaurantdb.insert(res3)
-
 
 if __name__=="__main__":
     logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

@@ -12,7 +12,6 @@ function submitUserResponse() {
     console.log(end)
     $.ajax({
         type: 'POST',
-        async: true,
         url: "/userUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,
@@ -55,7 +54,6 @@ function searchDB() {
     $.ajax({
         type: 'POST',
         url: "/searchDB",
-        async: false,
         data: JSON.stringify({
             "task_id": taskId,
             "name": name,
@@ -172,7 +170,6 @@ function submitWizardResponse() {
 
     $.ajax({
         type: 'POST',
-        async: false,
         url: "/wizardUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,
@@ -274,8 +271,6 @@ $(document).ready(function() {
             console.log(sysSlotNames)
             console.log(sysSlotValues)
         }
-
-
         var msg = '';
         for (i = 1; i < counter; i++) {
             msg += "\n Textbox #" + i + " : " + $('#textbox' + i).val();
