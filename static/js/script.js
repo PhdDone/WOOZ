@@ -189,9 +189,6 @@ function submitWizardResponse() {
             alert(JSON.stringify(response))
             console.log(response);
         }
-        complete: function () {
-            window.location.href = "www.google.com";
-        }
     });
 };
 
