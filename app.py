@@ -360,6 +360,8 @@ def searchDB():
         del r['_id']
 
     sortedlist = sorted(results, key=lambda k: float(k[dbutil.SCORE]), reverse=True)
+    if len(sortedlist) > 200:
+        sortedlist = sortedlist[0:200]
     return json.dumps(sortedlist)
 
 @app.route('/wizardUpdateTask', methods=['POST'])
