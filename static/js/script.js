@@ -170,6 +170,7 @@ function submitWizardResponse() {
 
     $.ajax({
         type: 'POST',
+        async: false,
         url: "/wizardUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,
