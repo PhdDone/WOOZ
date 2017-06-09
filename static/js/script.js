@@ -12,6 +12,7 @@ function submitUserResponse() {
     console.log(end)
     $.ajax({
         type: 'POST',
+        async: false,
         url: "/userUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,
@@ -54,6 +55,7 @@ function searchDB() {
     $.ajax({
         type: 'POST',
         url: "/searchDB",
+        async: false,
         data: JSON.stringify({
             "task_id": taskId,
             "name": name,
