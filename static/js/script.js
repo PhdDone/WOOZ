@@ -1,3 +1,10 @@
+//http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
+$(document).ajaxError(function(e, jqxhr, settings, exception) {
+    if (jqxhr.readyState == 0 || jqxhr.status == 0) {
+        return; //Skip this error
+    }
+});
+
 function submitUserResponse() {
     var taskId = $('#taskId').text();
     var userResponse = $('#userResponse').val();
@@ -180,6 +187,9 @@ function submitWizardResponse() {
         success: function (response) {
             alert(JSON.stringify(response))
             console.log(response);
+        }
+        complete: function () {
+            window.location.href = "www.google.com";
         }
     });
 };
