@@ -12,7 +12,7 @@ function submitUserResponse() {
     console.log(end)
     $.ajax({
         type: 'POST',
-        async: false,
+        async: true,
         url: "/userUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,

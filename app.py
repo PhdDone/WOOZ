@@ -81,8 +81,6 @@ def newTask():
 
     if not user_name:
         return redirect(url_for('login'))
-    app.logger.info("User %s is assigned with new random task", user_name)
-
     sample = random.uniform(0, 1)
     app.logger.info("have user task: %s, have wizard task: %s, sample prob: %.2f", dbutil.haveUserTask(), dbutil.haveWizardTask(), sample)
     if (dbutil.haveUserTask() or dbutil.haveWizardTask()) and sample > 0.2:
@@ -146,7 +144,6 @@ def newUserTask(task):
 
     if not user_name:
         return redirect(url_for('login'))
-    app.logger.info("User %s is assigned with a new user HIT", user_name)
     #get one task
     if task is None:
         task = dbutil.taskdb.find_and_modify(
@@ -190,7 +187,7 @@ def newUserTask(task):
         area = task[dbutil.AREA_NAME]
 
     #lookingFor = task[dbutil.LOOKING_FOR]
-
+    app.logger.info("User %s is assigned with a new user task: %s", user_name, taskId)
     #return render_template('user.html', taskId=taskId, venueName=venueName, foodType=foodType, area=area, priceRange=priceRange, address=address, lookingFor=lookingFor, sents=sents)
     return render_template('user.html', taskId=taskId, userGoal = userGoal, sents=sents)
 
@@ -199,8 +196,6 @@ def userUpdateTask():
     user_name = request.cookies.get('UserName')
     if not user_name:
         return redirect(url_for('login'))
-
-    app.logger.info("User %s finish a user HIT", user_name)
     if request.method == "POST":
         #print request
         content = request.get_json()
@@ -217,6 +212,7 @@ def userUpdateTask():
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
         #print taskId
+        app.logger.info("User %s finish a user HIT, task: %s", user_name, taskId)
         return json.dumps({'status':'OK','task_id': taskId, 'user_response': userResponse})
 
 #Wizard
@@ -226,7 +222,6 @@ def newWizardTask():
 
     if not user_name:
         return redirect(url_for('login'))
-    app.logger.info("User %s is assigned with new wizard HIT", user_name)
 
     task = dbutil.taskdb.find_and_modify(
         { dbutil.STATUS : dbutil.WT },
@@ -265,7 +260,7 @@ def newWizardTask():
     #result = dbutil.taskdb.update({"taskId": taskId}, {"$set": {
     #dbutil.STATUS: dbutil.WW
     #}})
-
+    app.logger.info("User %s is assigned with new wizard HIT", user_name)
     return render_template('wizard.html', taskId=taskId, sents = sents, prevFoodType = prevFoodType, prevAreaName = prevAreaName, prevUpperBound = prevUpperBound, prevLowerBound = prevLowerBound)
 
 def createDefaultDS():
@@ -370,7 +365,6 @@ def wizardUpdateTask():
     if not user_name:
         return redirect(url_for('login'))
 
-    app.logger.info("User %s finish a wizard HIT ", user_name)
     if request.method == "POST":
         #print request
         content = request.get_json()
@@ -397,6 +391,7 @@ def wizardUpdateTask():
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
         #print "returning"
+        app.logger.info("User %s finish a wizard task %s ", user_name, taskId)
         return json.dumps({'status':'OK','task_id': taskId, 'wizard_response': wizardResponse, 'sys_slot_info': sysSlotInfo})
 
 def initDb_v0():
