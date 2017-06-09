@@ -31,6 +31,10 @@ function searchDB() {
     var lowerBound = $('#priceRangeLowerBound').val();
     var upperBound = $('#priceRangeUpperBound').val();
 
+    if (lowerBound === upperBound && lowerBound != -1) {
+        lowerBound = lowerBound * 0.5
+        upperBound = upperBound * 1.5
+    }
     var askArea = $('#askArea').prop('checked')
     var askFoodType = $('#askFoodType').prop('checked')
     var askPrice = $('#askPrice').prop('checked')
@@ -48,8 +52,8 @@ function searchDB() {
             "name": name,
             "area": area,
             "food_type": foodType,
-            "lower_bound": lowerBound,
-            "upper_bound": upperBound,
+            "lower_bound": lowerBound.toString(),
+            "upper_bound": upperBound.toString(),
             "ds_asking_area": askArea,
             "ds_asking_food_type": askFoodType,
             "ds_asking_price": askPrice,
