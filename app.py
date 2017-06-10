@@ -203,6 +203,8 @@ def userUpdateTask():
         userResponse = content['user_response']
         #print userResponse
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
+        if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
+            return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})
         task[dbutil.USER_UTC].append("User: " + userResponse)
         task[dbutil.USER_UTC_ANNOTATOR].append(user_name)
         task[dbutil.STATUS] = dbutil.WT
@@ -385,7 +387,11 @@ def wizardUpdateTask():
         #print sysSlotInfo
         #print wizardResponse
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
-
+        #TODO: check it's a WT
+        print task[dbutil.STATUS]
+        print dbutil.WT
+        if task[dbutil.STATUS] != dbutil.WW and task[dbutil.STATUS] != dbutil.WT:
+            return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a wizard task'})
         #if len(task[dbutil.DIA_STATE]) < len(task[dbutil.USER_UTC]):
         #    return json.dumps({'status':'error','message': "请先填写对话状态信息"})
         task[dbutil.SYS_UTC].append("Sys: " + wizardResponse)

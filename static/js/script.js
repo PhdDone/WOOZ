@@ -6,6 +6,7 @@ $(document).ajaxError(function(e, jqxhr, settings, exception) {
 });
 
 function submitUserResponse() {
+    $('#userSubmit').hide()
     var taskId = $('#taskId').text();
     var userResponse = $('#userResponse').val();
     var end = $('#endOfDialogue').prop('checked');
@@ -117,9 +118,17 @@ function searchDB() {
     });
 };
 
-function submitWizardResponse() {
+function submitWizardResponse(form) {
     var taskId = $('#taskId').text();
     var wizardResponse = $('#wizardResponse').val();
+    if (wizardResponse == null || wizardResponse == "")
+    {
+        console.log("******")
+        alert("请填写您的回答");
+        return false;
+    }
+
+    $('#wizardSubmit').hide()
 
     var end = $('#endOfDialogue').prop('checked')
 
