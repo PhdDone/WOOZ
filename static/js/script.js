@@ -35,9 +35,9 @@ function submitUserResponse() {
 function searchDB() {
     firstTaskFinished = true
     var taskId = $('#taskId').text();
-    var name = $('#name').val();
-    var area = $('#area').val();
-    var foodType = $('#foodType').val();
+    var name = $('#name').val().trim();
+    var area = $('#area').val().trim();
+    var foodType = $('#foodType').val().trim();
     var lowerBound = $('#priceRangeLowerBound').val();
     var upperBound = $('#priceRangeUpperBound').val();
 
@@ -116,7 +116,8 @@ function searchDB() {
                  );*/
             });
             if (response.length === 0) {
-                alert("数据库中没有找到符合搜索条件的餐馆")
+                //alert("没有找到符合搜索条件的餐馆，请用自然语言告知用户即可。")
+                $('#added-articles').append('<h4>' + "数据库中没有找到符合搜索条件的餐馆" +  '</h4>')
             }
 
         }
@@ -127,7 +128,7 @@ function submitWizardResponse(form) {
     var taskId = $('#taskId').text();
     var wizardResponse = $('#wizardResponse').val();
     if (!firstTaskFinished) {
-        alert("请完成第一步");
+        alert("请先完成第一步");
         return false;
     }
     if (wizardResponse == null || wizardResponse == "")
@@ -236,10 +237,8 @@ $(document).ready(function() {
     });
 
     $("#AddDiaact").click(function () {
-        console.log("addnewact")
-
         if (counter > 10) {
-            alert("Only 10 textboxes allow");
+            alert("Only 10 dia act is allowed");
             return false;
         }
         var index = counter

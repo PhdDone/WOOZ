@@ -11,6 +11,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import logging
 import random
+import datetime
 
 from logging.handlers import RotatingFileHandler
 
@@ -206,11 +207,8 @@ def userUpdateTask():
         if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
             return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})
         task[dbutil.USER_UTC].append("User: " + userResponse)
-        task[dbutil.USER_UTC_ANNOTATOR].append(user_name)
+        task[dbutil.USER_UTC_ANNOTATOR].append(user_name + " / " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         task[dbutil.STATUS] = dbutil.WT
-        #end = content["end"]
-        #if end:
-            #task[dbutil.STATUS] = dbutil.FT
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
         #print taskId
@@ -321,7 +319,8 @@ def searchDB():
                                    #dbutil.DS_ASKING_FOOD_TYPE: askFoodType,
                                    dbutil.DS_ASKING_PRICE: askPrice,
                                    dbutil.DS_ASKING_SCORE: askScore},
-              dbutil.SYS_DIA_ANNOTATOR: user_name
+              dbutil.SYS_DIA_ANNOTATOR: user_name,
+              dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     #newDS = foodType + "," + area + "," + str(priceLowerBound) + "," + str(priceUpperBound) + "," + str(askFoodType) + "," + str(askArea) + "," + str(askPrice)
@@ -398,7 +397,7 @@ def wizardUpdateTask():
         task[dbutil.STATUS] = dbutil.UT
         #print task
         #task[dbutil.DIA_ACT].append({dbutil.SYS_DIA_ACT : sysDiaAct, dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
-        task[dbutil.DIA_ACT].append({dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
+        task[dbutil.DIA_ACT].append({dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name, dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
         end = content["end"]
         if end:
             task[dbutil.STATUS] = dbutil.FT
