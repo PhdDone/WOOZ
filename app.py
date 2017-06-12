@@ -191,32 +191,24 @@ def newUserTask(task):
     #return render_template('user.html', taskId=taskId, venueName=venueName, foodType=foodType, area=area, priceRange=priceRange, address=address, lookingFor=lookingFor, sents=sents)
     return render_template('user.html', taskId=taskId, userGoal = userGoal, sents=sents)
 
-@app.route('/userUpdateTask', methods=['POST'])
-def userUpdateTask():
+@app.route('/userUpdateTask/<taskId>', methods=['GET', 'POST'])
+def userUpdateTask(taskId):
     user_name = request.cookies.get('UserName')
     if not user_name:
         return redirect(url_for('login'))
     if request.method == "POST":
         #print request
         content = request.get_json()
-        taskId = content[dbutil.TASK_ID]
-        userResponse = content['user_response']
+        newTask = content['newTask']
         #print userResponse
-        task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
-        if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
-            return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})
-        task[dbutil.USER_UTC].append("User: " + userResponse)
-        task[dbutil.USER_UTC_ANNOTATOR].append(user_name)
-        task[dbutil.STATUS] = dbutil.WT
-        #end = content["end"]
-        #if end:
-            #task[dbutil.STATUS] = dbutil.FT
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
-        dbutil.taskdb.insert(task)
+        dbutil.taskdb.insert(newTask)
         #print taskId
-        app.logger.info("User %s finish a user HIT, task: %s", user_name, taskId)
-        return json.dumps({'status':'OK','task_id': taskId, 'user_response': userResponse})
-
+        app.logger.info("User %s update a task: %s", user_name, taskId)
+        return json.dumps({'status':'OK','task_id': taskId, 'newTask': newTask})
+    if request.method == "GET":
+        task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId}, {'_id': False})
+        return json.dumps({'status': 'OK', 'task_id': taskId, 'task': task})
 #Wizard
 @app.route('/newWizardTask')
 def newWizardTask():
@@ -453,4 +445,4 @@ if __name__=="__main__":
     app.logger.addHandler(handler)
     dbutil.loadTask()
     dbutil.loadRestaurantData()
-    app.run(host='0.0.0.0', port=9005, debug=True)
+    app.run(host='0.0.0.0', port=9005, debug=False)
