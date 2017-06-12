@@ -225,9 +225,9 @@ def loadTask():
 
     import re
     p = re.compile('\{(.*?)\}')
-    File = "./data/sampled.task.smoothed.500"
+    File = "./data/sampled.task.smoothed.251-500"
     file = open(File, "r")
-    taskID = 1
+    taskID = 251
     for line in file.readlines():
         user_goal = line.split("。")[0]
         lookFor = line.split("。")[-1]
