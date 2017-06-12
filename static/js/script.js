@@ -113,6 +113,9 @@ function searchDB() {
                  .append(td_tags)
                  );*/
             });
+            if (response.length === 0) {
+                alert("数据库中没有找到符合搜索条件的餐馆")
+            }
 
         }
     });
