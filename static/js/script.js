@@ -1,4 +1,5 @@
 //http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
+var firstTaskFinished = false
 $(document).ajaxError(function(e, jqxhr, settings, exception) {
     if (jqxhr.readyState == 0 || jqxhr.status == 0) {
         return; //Skip this error
@@ -32,6 +33,7 @@ function submitUserResponse() {
 };
 
 function searchDB() {
+    firstTaskFinished = true
     var taskId = $('#taskId').text();
     var name = $('#name').val();
     var area = $('#area').val();
@@ -124,9 +126,12 @@ function searchDB() {
 function submitWizardResponse(form) {
     var taskId = $('#taskId').text();
     var wizardResponse = $('#wizardResponse').val();
+    if (!firstTaskFinished) {
+        alert("请完成第一步");
+        return false;
+    }
     if (wizardResponse == null || wizardResponse == "")
     {
-        console.log("******")
         alert("请填写您的回答");
         return false;
     }
