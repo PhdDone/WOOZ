@@ -451,6 +451,6 @@ if __name__=="__main__":
     handler.setFormatter(formatter)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    dbutil.loadTask()
-    dbutil.loadRestaurantData()
+    #dbutil.loadTask()
+    #dbutil.loadRestaurantData()
     app.run(host='0.0.0.0', port=9005, debug=True)

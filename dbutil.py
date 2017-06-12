@@ -328,6 +328,10 @@ def haveWizardTask():
     WT_tasks = list(taskdb.find({STATUS : WT}))
     return len(WT_tasks) > 0
 
+def finishedTask():
+    WT_tasks = list(taskdb.find({STATUS : FT}))
+    print len(WT_tasks)
+
 if __name__=="__main__":
     #init()
 
@@ -337,7 +341,8 @@ if __name__=="__main__":
     #testSearchDB()
     #logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     #loadTask()
-    buildQueryKey()
+    #buildQueryKey()
     #resetWWtoWT()
     #resetWUtoUT()
     #chooseByColum(FOOD_TYPE)
+    finishedTask()
