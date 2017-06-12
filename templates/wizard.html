@@ -8,11 +8,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="static/js/script.js"></script>
+    <link href="static/css/signin.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
-    <div>
+    <div class="highlight">
         <h3>标注说明:</h3>
         <ul>
             <li>一次<font color="red">不能</font>同时回复多个餐馆的信息。</li>
@@ -221,7 +222,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">
-                            用户<b>这一轮</b>询问了什么信息?
+                            用户在最新的<b>这一轮</b>中是否询问了餐馆的地址, 价格或者评分，如果没有询问则可以不填。
                         </h3>
                     </div>
                     <div class="panel-body">
@@ -234,15 +235,15 @@
                         </div> -->
 
                         <div class="form-group">
-                            <label for="name">系统和用户<b>这一轮</b>正在讨论的餐馆的名称：</label>
+                            <label for="name">系统和用户<b>这一轮</b>中正在讨论的餐馆的名称：</label>
                             <input type="text" class="form-control" id="name" aria-describedby="nameHelp"
                                    placeholder="餐馆名称">
-                            <small id="foodTypeHelp" class="form-text text-muted">Leave blank if not known.</small>
+                            <small id="foodTypeHelp" class="form-text text-muted">餐馆名称会被用来搜索数据库，并在页面底部显示相应餐馆的信息</small>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" value="" id="askArea">
-                                用户<b>这一轮</b>询问了餐厅的<b>区域</b>?
+                                用户<b>这一轮</b>询问了餐厅的<b>地址</b>?
                             </label>
                         </div>
 
@@ -407,6 +408,9 @@
                             <option>再见/goodbye (再见)</option>
                             <option>更改需求/request_alts (您可以吃点别的吗)</option>
                             <option>对不起/sorry (对不起)</option>
+                            <option>谢谢/thank_you (谢谢)</option>
+                            <option>不用谢/you_are_welcome (不用谢)</option>
+                            <option>其他/other</option>
                         </select>
                         </div>
                         <form class="form-inline">
@@ -430,10 +434,11 @@
                 <input type='button' value='更多系统行为' id='AddDiaact'>
                 <input type='button' value='删除系统行为' id='RemoveDiaact'>
                 </div>
-                <div class="form-check col-xs-12" style="padding:0">
+                <div class="form-check col-xs-12" style="padding:0;">
+                    <h4>您可以通过对话历史决定是否结束对话：</h4>
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" value="" id="endOfDialogue">
-                        结束会话?
+                        结束对话?
                     </label>
                 </div>
                 <div class="form-check col-xs-12" style="padding:0">

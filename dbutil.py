@@ -45,7 +45,6 @@ DS_AREA = "ds_area"
 DS_PRICE_LOWER_BOUND = "ds_price_lower_bound"
 DS_PRICE_UPPER_BOUND = "ds_prece_upper_bound"
 
-
 DS_ASKING_FOOD_TYPE = "ds_asking_food_type"
 DS_ASKING_AREA = "ds_asking_area"
 DS_ASKING_PRICE = "ds_asking_price"
@@ -106,6 +105,8 @@ SYS_DIA_ACT_RECOMMEND = "recommend"
 SYS_DIA_ACT_REPEAT = "repeat"
 
 SYS_SLOT_INFO = "sys_slot_info"
+
+TIME_STAMP = "time_stamp"
 
 def resetTask(taskID):
     oldTask = list(taskdb.find({TASK_ID: taskID}))[0]
