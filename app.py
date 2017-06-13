@@ -92,7 +92,7 @@ def newTask():
     else:
         #try to open new task
         task = dbutil.taskdb.find_and_modify( { dbutil.STATUS : dbutil.NT },
-                                              {"$set": { dbutil.STATUS: dbutil.UT}})
+                                              {"$set": { dbutil.STATUS: dbutil.WU}})
         if task is None:
             if dbutil.haveWizardTask():
                 return newWizardTask()
