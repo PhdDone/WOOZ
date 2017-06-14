@@ -202,7 +202,9 @@ def userUpdateTask():
         content = request.get_json()
         taskId = content[dbutil.TASK_ID]
         userResponse = content['user_response']
-        version = content['version']
+        version = 0
+        if "version" in content.keys():
+            version = content['version']
         #print userResponse
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
         if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
@@ -283,7 +285,9 @@ def searchDB():
     content = request.get_json()
     area = content[dbutil.AREA]
     name = content[dbutil.NAME]
-    version = content[dbutil.VERTION]
+    version = 0
+    if "version" in content.keys():
+        version = content['version']
     foodType = content[dbutil.FOOD_TYPE]
 
     priceLowerBound = -1
@@ -384,7 +388,9 @@ def wizardUpdateTask():
         #print content
         taskId = content[dbutil.TASK_ID]
         wizardResponse = content['wizard_response']
-        version = content['version']
+        version = 0
+        if "version" in content.keys():
+            version = content['version']
         #sysDiaAct = content[dbutil.SYS_DIA_ACT]
         sysSlotInfo = content[dbutil.SYS_SLOT_INFO]
         #print sysSlotInfo
