@@ -8,7 +8,7 @@ restdb.tasks.drop()
 restdb.restaurant.drop()
 
 #call bash
-bashCommand = "mongorestore db/backups/2017-06-12--11:42:30"
+bashCommand = "mongorestore db/backups/2017-06-13--18:45:01"
 import subprocess
 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
