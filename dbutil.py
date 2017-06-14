@@ -107,6 +107,7 @@ SYS_DIA_ACT_REPEAT = "repeat"
 SYS_SLOT_INFO = "sys_slot_info"
 
 TIME_STAMP = "time_stamp"
+VERTION = "version"
 
 def resetTask(taskID):
     oldTask = list(taskdb.find({TASK_ID: taskID}))[0]

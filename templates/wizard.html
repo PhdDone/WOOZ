@@ -186,27 +186,29 @@
                             <input type="text" class="form-control" id="foodType" list="do-not-care" aria-describedby="foodTypeHelp"
                                    value={{ prevFoodType.decode('utf-8') }}>
                             <datalist id="do-not-care">
-                                <option value="无所谓/DO_NOT_CARE">
+                                <option value="DO_NOT_CARE">
                             </datalist>
-                            <small id="foodTypeHelp" class="form-text text-muted">Leave blank if not known.</small>
+                            <small id="foodTypeHelp" class="form-text text-muted">如果用户未说明请留空不填。如果用户明确表示对菜系无所谓，请填写DO_NOT_CARE.</small>
                         </div>
 
                         <div class="form-group">
                             <label for="area">用户选择什么区域就餐：</label>
-                            <input type="text" class="form-control" id="area" list="do-not-care" value={{ prevAreaName.decode('utf-8') }}>
-                            <small id="foodTypeHelp" class="form-text text-muted">Leave blank if not known.</small>
+                            <input type="text" class="form-control" id="area" list="do-not-care" placeholder="" value={{ prevAreaName.decode('utf-8') }}>
+                            <small id="foodTypeHelp" class="form-text text-muted">如果用户未说明请留空不填，如果用户明确表示对区域无所谓，请填写DO_NOT_CARE</small>
                         </div>
                         <div class="form-group">
                             <label for="priceRangeLowerBound">用户想要价位的下限：</label>
-                            <input type="text" class="form-control" id="priceRangeLowerBound"
-                                   aria-describedby="priceRangeHelp"
+                            <input type="text" class="form-control" id="priceRangeLowerBound" list="do-not-care"
+                                   aria-describedby="priceRangeHelp" placeholder="如果用户未说明请留空不填，如果用户明确表示对下限无所谓，请填写'DO_NOT_CARE'."
                                    value={{ prevLowerBound }}>
-                            <br>
+                            <small id="foodTypeHelp" class="form-text text-muted">如果用户未说明请填写-1。如果用户明确表示对价格无所谓，请填写DO_NOT_CARE。如果用户说90元或者90元左右，上下限都填90。</small>
+                        </div>
+                        <div class="form-group">
                             <label for="priceRangeLowerBound">用户想要价位的上限：</label>
                             <input type="text" class="form-control" id="priceRangeUpperBound"
-                                   aria-describedby="priceRangeHelp"
+                                   aria-describedby="priceRangeHelp" list="do-not-care" placeholder="如果用户未说明请留空不填，如果用户明确表示对上限无所谓，请填写'DO_NOT_CARE'."
                                    value={{ prevUpperBound }} placeholder="上限">
-                            <small id="priceRangeHelp" class="form-text text-muted">如果用户说90元或者90元左右，上下限都填90。999999是系统默认价格的上线
+                            <small id="priceRangeHelp" class="form-text text-muted">同上。
                             </small>
                         </div>
 

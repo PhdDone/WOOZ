@@ -1,5 +1,7 @@
 //http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
 var firstTaskFinished = false
+var version = 1.5
+
 $(document).ajaxError(function(e, jqxhr, settings, exception) {
     if (jqxhr.readyState == 0 || jqxhr.status == 0) {
         return; //Skip this error
@@ -18,7 +20,7 @@ function submitUserResponse() {
         data: JSON.stringify({
             "task_id": taskId,
             "user_response": userResponse,
-            "end": end
+            "version": version
         }),
         error: function (e) {
             console.log(e);
@@ -38,8 +40,16 @@ function searchDB() {
     var name = $('#name').val().trim();
     var area = $('#area').val().trim();
     var foodType = $('#foodType').val().trim();
-    var lowerBound = $('#priceRangeLowerBound').val();
-    var upperBound = $('#priceRangeUpperBound').val();
+    var lowerBound = $('#priceRangeLowerBound').val().trim();
+    var upperBound = $('#priceRangeUpperBound').val().trim();
+
+    if (lowerBound.indexOf("/") != -1) {
+        lowerBound = -1
+    }
+
+    if (upperBound.indexOf("/") != -1) {
+        upperBound = -1
+    }
 
     if (lowerBound === upperBound && lowerBound != -1) {
         lowerBound = lowerBound * 0.5
@@ -67,7 +77,8 @@ function searchDB() {
             "ds_asking_area": askArea,
             "ds_asking_food_type": askFoodType,
             "ds_asking_price": askPrice,
-            "ds_asking_score": askScore
+            "ds_asking_score": askScore,
+            "version": version
         }),
         error: function (e) {
             console.log(e);
@@ -194,7 +205,8 @@ function submitWizardResponse(form) {
             "wizard_response": wizardResponse,
             "sys_dia_act": sysAct,
             "end": end,
-            "sys_slot_info": allSlots
+            "sys_slot_info": allSlots,
+            "version": version
         }),
         error: function (e) {
             alert(JSON.stringify(e))
