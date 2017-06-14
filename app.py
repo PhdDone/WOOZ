@@ -202,12 +202,13 @@ def userUpdateTask():
         content = request.get_json()
         taskId = content[dbutil.TASK_ID]
         userResponse = content['user_response']
+        version = content['version']
         #print userResponse
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
         if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
             return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})
         task[dbutil.USER_UTC].append("User: " + userResponse)
-        task[dbutil.USER_UTC_ANNOTATOR].append(user_name + " / " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        task[dbutil.USER_UTC_ANNOTATOR].append(user_name + " / " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " / " + str(version))
         task[dbutil.STATUS] = dbutil.WT
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
         dbutil.taskdb.insert(task)
@@ -282,14 +283,15 @@ def searchDB():
     content = request.get_json()
     area = content[dbutil.AREA]
     name = content[dbutil.NAME]
+    version = content[dbutil.VERTION]
     foodType = content[dbutil.FOOD_TYPE]
 
     priceLowerBound = -1
     priceUpperBound = -1
 
-    if len(content["lower_bound"]) > 0:
+    if len(content["lower_bound"]) > 0 and ("DO_NOT_CARE" not in content["lower_bound"]):
         priceLowerBound = int(content["lower_bound"])
-    if len(content["upper_bound"]) > 0:
+    if len(content["upper_bound"]) > 0 and ("DO_NOT_CARE" not in content["upper_bound"]):
         priceUpperBound = int(content["upper_bound"])
 
     if priceLowerBound != -1 and priceUpperBound <=0:
@@ -320,7 +322,8 @@ def searchDB():
                                    dbutil.DS_ASKING_PRICE: askPrice,
                                    dbutil.DS_ASKING_SCORE: askScore},
               dbutil.SYS_DIA_ANNOTATOR: user_name,
-              dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+              dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+              dbutil.VERTION: version
     }
 
     #newDS = foodType + "," + area + "," + str(priceLowerBound) + "," + str(priceUpperBound) + "," + str(askFoodType) + "," + str(askArea) + "," + str(askPrice)
@@ -338,9 +341,9 @@ def searchDB():
     #res = list(restaurantdb.find({AREA_NAME : {'$regex' : '.*' + '三元桥' + '.*'}}))
     #build search key
     key = {}
-    if len(area) != 0:
+    if len(area) != 0 and ("DO_NOT_CARE" not in area):
         key[dbutil.AREA_NAME] = {'$regex': '.*' + area + '.*'}
-    if len(foodType) != 0:
+    if len(foodType) != 0 and ("DO_NOT_CARE" not in foodType):
         key[dbutil.FOOD_TYPE] = {'$regex': '.*' + foodType + '.*'}
     if priceLowerBound != -1:
         key[dbutil.PRICE] = {'$gt':  priceLowerBound, '$lt': priceUpperBound}
@@ -381,6 +384,7 @@ def wizardUpdateTask():
         #print content
         taskId = content[dbutil.TASK_ID]
         wizardResponse = content['wizard_response']
+        version = content['version']
         #sysDiaAct = content[dbutil.SYS_DIA_ACT]
         sysSlotInfo = content[dbutil.SYS_SLOT_INFO]
         #print sysSlotInfo
@@ -397,7 +401,8 @@ def wizardUpdateTask():
         task[dbutil.STATUS] = dbutil.UT
         #print task
         #task[dbutil.DIA_ACT].append({dbutil.SYS_DIA_ACT : sysDiaAct, dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name})
-        task[dbutil.DIA_ACT].append({dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name, dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        task[dbutil.DIA_ACT].append({dbutil.SYS_UTC : wizardResponse, dbutil.SYS_SLOT_INFO: sysSlotInfo, dbutil.SYS_DIA_ANNOTATOR: user_name, dbutil.TIME_STAMP: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                     dbutil.VERTION : version})
         end = content["end"]
         if end:
             task[dbutil.STATUS] = dbutil.FT
