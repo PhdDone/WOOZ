@@ -1,0 +1,2 @@
+*/15 * * * * /bin/sh /home/yzhdong/mobvoi/wooz/WOOZ/dumpDb.sh
+
