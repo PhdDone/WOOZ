@@ -293,6 +293,8 @@ def searchDB():
     priceLowerBound = -1
     priceUpperBound = -1
 
+    print content["lower_bound"]
+
     if len(content["lower_bound"]) > 0 and ("DO_NOT_CARE" not in content["lower_bound"]):
         priceLowerBound = int(content["lower_bound"])
     if len(content["upper_bound"]) > 0 and ("DO_NOT_CARE" not in content["upper_bound"]):
@@ -303,6 +305,10 @@ def searchDB():
 
     if priceUpperBound != -1 and priceLowerBound <=0:
         priceLowerBound = 0
+
+    if priceLowerBound == priceUpperBound and priceLowerBound != -1:
+        priceLowerBound = priceLowerBound * 0.5
+        priceUpperBound = priceUpperBound * 1.5
 
     #askFoodType = content[dbutil.DS_ASKING_FOOD_TYPE]
     askArea = content[dbutil.DS_ASKING_AREA]
@@ -318,8 +324,8 @@ def searchDB():
     #TODO: update DS
     newDS = { dbutil.DS_GOAL_LABELS : { dbutil.FOOD_TYPE : foodType,
                                 dbutil.AREA_NAME: area,
-                                dbutil.DS_PRICE_LOWER_BOUND: priceLowerBound,
-                                dbutil.DS_PRICE_UPPER_BOUND: priceUpperBound
+                                dbutil.DS_PRICE_LOWER_BOUND: content["lower_bound"],
+                                dbutil.DS_PRICE_UPPER_BOUND: content["upper_bound"]
                                 },
               dbutil.DS_REQUEST_SLOTS : { dbutil.DS_ASKING_AREA: askArea,
                                    #dbutil.DS_ASKING_FOOD_TYPE: askFoodType,
