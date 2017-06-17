@@ -205,7 +205,7 @@ def userUpdateTask():
         version = 0
         if "version" in content.keys():
             version = content['version']
-        #print userResponse
+        print version
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
         if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
             return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})

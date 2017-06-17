@@ -1,7 +1,10 @@
 
 var firstTaskFinished = false
-//var version = 1.5
-var version = 1.6 //fix price bug, save do_not_care into db, save original price into db
+//version = 1.5
+//version = 1.6 //fix price bug, save do_not_care into db, save original price into db
+
+
+var version = null;
 
 //https://stackoverflow.com/questions/25025465/tracking-ajax-error-on-readystate-0-status-0-and-statustext-error
 //http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
@@ -234,7 +237,7 @@ function submitWizardResponse(form) {
 
 $(document).ready(function() {
     firstTaskFinished = false
-    version = 1.5
+    version = 1.6
     var buttonadd = '<div class="col-xs-2" style="padding: 0;"><button class="btn btn-success btn-add" type="button"><div class="glyphicon glyphicon-plus"></button></div>';
     var fvrhtmlclone = '<div class="fvrclonned col-xs-12">' + $(".fvrduplicate").html() + buttonadd + '</div>';
     $(".fvrduplicate").html(fvrhtmlclone);
