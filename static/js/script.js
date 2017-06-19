@@ -1,8 +1,8 @@
 
 var firstTaskFinished = false
-//version = 1.5
-//version = 1.6 //fix price bug, save do_not_care into db, save original price into db
-
+//version 1.5
+//version 1.6 //fix price bug, save do_not_care into db, save original price into db
+//version 1.6.1 // fix ajax redirect bug
 
 var version = null;
 
@@ -146,7 +146,7 @@ function searchDB() {
                 //alert("没有找到符合搜索条件的餐馆，请用自然语言告知用户即可。")
                 $('#added-articles').append('<h4>' + "数据库中没有找到符合搜索条件的餐馆" +  '</h4>')
             }
-
+            alert("请继续完成第二步，餐厅查询结果显示在页面底部。")
         }
     });
 };
@@ -231,6 +231,7 @@ function submitWizardResponse(form) {
         success: function (response) {
             alert(JSON.stringify(response))
             console.log(response);
+            window.location.href = "/newTask";
         }
     });
 };
