@@ -1,7 +1,13 @@
-//http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
-var firstTaskFinished = false
-var version = 1.5
 
+var firstTaskFinished = false
+//version 1.5
+//version 1.6 //fix price bug, save do_not_care into db, save original price into db
+//version 1.6.1 // fix ajax redirect bug
+
+var version = null;
+
+//https://stackoverflow.com/questions/25025465/tracking-ajax-error-on-readystate-0-status-0-and-statustext-error
+//http://bartwullems.blogspot.com.tr/2012/02/ajax-request-returns-status-0.html
 $(document).ajaxError(function(e, jqxhr, settings, exception) {
     if (jqxhr.readyState == 0 || jqxhr.status == 0) {
         return; //Skip this error
@@ -42,18 +48,25 @@ function searchDB() {
     var foodType = $('#foodType').val().trim();
     var lowerBound = $('#priceRangeLowerBound').val().trim();
     var upperBound = $('#priceRangeUpperBound').val().trim();
-
-    if (lowerBound.indexOf("/") != -1) {
+    /*
+    if (lowerBound.indexOf("DO") != -1) {
         lowerBound = -1
     }
 
-    if (upperBound.indexOf("/") != -1) {
+    if (upperBound.indexOf("DO") != -1) {
         upperBound = -1
-    }
-
-    if (lowerBound === upperBound && lowerBound != -1) {
+    }*/
+    console.log(lowerBound.indexOf("DO"))
+    /*if (lowerBound === upperBound && lowerBound != -1 && !isNaN(parseFloat(lowerBound))) {
         lowerBound = lowerBound * 0.5
         upperBound = upperBound * 1.5
+    }*/
+    if (!isNaN(parseFloat(lowerBound))) {
+        lowerBound = lowerBound.toString()
+    }
+
+    if (!isNaN(parseFloat(upperBound))) {
+        upperBound = upperBound.toString()
     }
     var askArea = $('#askArea').prop('checked')
     var askFoodType = $('#askFoodType').prop('checked')
@@ -64,6 +77,9 @@ function searchDB() {
     console.log(foodType)
     console.log(askArea)
 
+    console.log(lowerBound.toString())
+    console.log(upperBound.toString())
+
     $.ajax({
         type: 'POST',
         url: "/searchDB",
@@ -72,8 +88,8 @@ function searchDB() {
             "name": name,
             "area": area,
             "food_type": foodType,
-            "lower_bound": lowerBound.toString(),
-            "upper_bound": upperBound.toString(),
+            "lower_bound": lowerBound,
+            "upper_bound": upperBound,
             "ds_asking_area": askArea,
             "ds_asking_food_type": askFoodType,
             "ds_asking_price": askPrice,
@@ -130,7 +146,7 @@ function searchDB() {
                 //alert("没有找到符合搜索条件的餐馆，请用自然语言告知用户即可。")
                 $('#added-articles').append('<h4>' + "数据库中没有找到符合搜索条件的餐馆" +  '</h4>')
             }
-
+            alert("请继续完成第二步，餐厅查询结果显示在页面底部。")
         }
     });
 };
@@ -195,8 +211,6 @@ function submitWizardResponse(form) {
     //for (var i = 0; i < allSlots.length; ++i) {
     //    console.log(allSlots[i])
     //}
-
-
     $.ajax({
         type: 'POST',
         url: "/wizardUpdateTask",
@@ -217,11 +231,14 @@ function submitWizardResponse(form) {
         success: function (response) {
             alert(JSON.stringify(response))
             console.log(response);
+            window.location.href = "/newTask";
         }
     });
 };
 
 $(document).ready(function() {
+    firstTaskFinished = false
+    version = 1.6
     var buttonadd = '<div class="col-xs-2" style="padding: 0;"><button class="btn btn-success btn-add" type="button"><div class="glyphicon glyphicon-plus"></button></div>';
     var fvrhtmlclone = '<div class="fvrclonned col-xs-12">' + $(".fvrduplicate").html() + buttonadd + '</div>';
     $(".fvrduplicate").html(fvrhtmlclone);
