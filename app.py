@@ -78,10 +78,11 @@ def do_that():
 
 @app.route('/newTask')
 def newTask():
-    user_name = request.cookies.get('UserName')
+    #user_name = request.cookies.get('UserName')
 
-    if not user_name:
-        return redirect(url_for('login'))
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     sample = random.uniform(0, 1)
     app.logger.info("have user task: %s, have wizard task: %s, sample prob: %.2f", dbutil.haveUserTask(), dbutil.haveWizardTask(), sample)
     if (dbutil.haveUserTask() or dbutil.haveWizardTask()) and sample > 0.2:
@@ -140,11 +141,12 @@ def show_all():
     return json.dumps(list(dbutil.taskdb.find({},{'_id': False})))
 
 @app.route('/newUserTask')
-def newUserTask(task):
-    user_name = request.cookies.get('UserName')
+def newUserTask(task=None):
+    #user_name = request.cookies.get('UserName')
 
-    if not user_name:
-        return redirect(url_for('login'))
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     #get one task
     if task is None:
         task = dbutil.taskdb.find_and_modify(
@@ -194,9 +196,11 @@ def newUserTask(task):
 
 @app.route('/userUpdateTask', methods=['POST'])
 def userUpdateTask():
-    user_name = request.cookies.get('UserName')
-    if not user_name:
-        return redirect(url_for('login'))
+    #user_name = request.cookies.get('UserName')
+    # for testing
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     if request.method == "POST":
         #print request
         content = request.get_json()
@@ -221,11 +225,11 @@ def userUpdateTask():
 #Wizard
 @app.route('/newWizardTask')
 def newWizardTask():
-    user_name = request.cookies.get('UserName')
+    #user_name = request.cookies.get('UserName')
 
-    if not user_name:
-        return redirect(url_for('login'))
-
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     task = dbutil.taskdb.find_and_modify(
         { dbutil.STATUS : dbutil.WT },
         {"$set": { dbutil.STATUS: dbutil.WW}}
@@ -276,10 +280,10 @@ def createDefaultDS():
 
 @app.route('/searchDB',methods=['POST'])
 def searchDB():
-    user_name = request.cookies.get('UserName')
-    if not user_name:
-        return redirect(url_for('login'))
-
+    #user_name = request.cookies.get('UserName')
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     app.logger.info("User %s is searching DB", user_name)
     #print request
     content = request.get_json()
@@ -379,9 +383,9 @@ def updateTask():
 @app.route('/wizardUpdateTask', methods=['POST'])
 def wizardUpdateTask():
     user_name = request.cookies.get('UserName')
-    if not user_name:
-        return redirect(url_for('login'))
-
+    #if not user_name:
+    #    return redirect(url_for('login'))
+    user_name = "TEST"
     if request.method == "POST":
         #print request
         content = request.get_json()
