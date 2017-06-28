@@ -40,6 +40,54 @@ function submitUserResponse() {
     });
 };
 
+function searchEditTask() {
+    var taskId = $('#taskId').val().trim();
+    console.log(taskId)
+    $.ajax({
+        type: 'POST',
+        url: "/searchEditTask",
+        data: JSON.stringify({
+            "task_id": taskId,
+        }),
+        error: function (e) {
+            console.log(e);
+        },
+        dataType: "json",
+        contentType: "application/json",
+        success: function (response) {
+                var pretty = JSON.stringify(response, undefined, 4);
+                console.log(pretty)
+                $('#taskJson').val(pretty)
+            alert(JSON.stringify(response))
+            console.log(response);
+        }
+    });
+};
+
+function submitEditTask() {
+    var taskJsonString = $('#taskJson').val()
+    var taskJson = JSON.parse(taskJsonString)
+    $.ajax({
+        type: 'POST',
+        url: "/submitEditTask",
+        data: JSON.stringify({
+            "task_json": taskJson
+        }),
+        error: function (e) {
+            console.log(e);
+        },
+        dataType: "json",
+        contentType: "application/json",
+        success: function (response) {
+            var pretty = JSON.stringify(response, undefined, 4);
+            console.log(pretty)
+            $('#taskJson').val(pretty)
+            alert(JSON.stringify(response))
+            console.log(response);
+        }
+    });
+};
+
 function searchDB() {
     firstTaskFinished = true
     var taskId = $('#taskId').text();

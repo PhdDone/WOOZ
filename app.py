@@ -16,7 +16,7 @@ import datetime
 from logging.handlers import RotatingFileHandler
 
 from flask import render_template, request, redirect, url_for
-
+from flask import jsonify
 
 app = Flask(__name__)
 
@@ -25,6 +25,11 @@ app = Flask(__name__)
 
 #mongo = PyMongo(app)
 
+admins = {
+    "puyangxu@mobvoi.com": "nopassword",
+    "qihu@mobvoi.com": "meiyoumima",
+    "yzhdong@mobvoi.com": "mobvoi"
+}
 
 @app.route("/")
 def home():
@@ -34,8 +39,14 @@ def home():
 def setcookie():
     if request.method == 'POST':
         user = request.form['username']
-        resp = redirect(url_for("newTask"))
-        resp.set_cookie('UserName', user)
+        if 'password' in request.form.keys():
+            password = request.form['password']
+            resp = redirect(url_for("editTask"))
+            resp.set_cookie('Password', password)
+            resp.set_cookie('UserName', user)
+        else:
+            resp = redirect(url_for("newTask"))
+            resp.set_cookie('UserName', user)
         return resp
 
 @app.route("/login", methods=["GET", "POST"])
@@ -62,19 +73,17 @@ def login():
     else:
         return render_template("index.html")
 
-@app.route("/do-that")
-def do_that():
-    user_id = request.cookies.get('UserName')
-    if user_id:
-        user = database.get(user_id)
-        if user:
-            # Success!
-            return render_template('do_that.html', user=user)
-        else:
-            return redirect(url_for('login'))
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        user_name = request.form["name"]
+        password = request.form["password"]
+        response = redirect(url_for("editTask"))
+        response.set_cookie('UserName', user_name)
+        response.set_cookie("Password", password)
+        return response
     else:
-        return redirect(url_for('login'))
-
+        return render_template("admin.html")
 
 @app.route('/newTask')
 def newTask():
@@ -121,18 +130,69 @@ def buildSents(sysUtc, userUtc):
         idx += 1
     return sents
 
-@app.route('/resetTask/<taskID>')
-def resetTaskById(taskID):
-    task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
-    if task != None:
-        return json.dumps(task)
-    return json.dumps({"status": "Not found"})
-
 @app.route('/task/<taskID>')
 def getTaskById(taskID):
     task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
     if task != None:
         return json.dumps(task)
+    return json.dumps({"status": "Not found"})
+
+def checkAdmin(request):
+    user_name = request.cookies.get('UserName')
+    password = request.cookies.get('Password')
+    if user_name in admins.keys() and admins[user_name] == password:
+        return True
+    return False
+
+@app.route('/editTask', methods = ['POST', 'GET'])
+def editTask():
+    if not checkAdmin(request):
+        return redirect(url_for('admin'))
+
+    if request.method == "GET":
+        content = request.get_json()
+        if content == None:
+            return render_template("editTask.html")
+        taskID = content[dbutil.TASK_ID]
+        console.log(taskID)
+        task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
+        if task != None:
+            return json.dumps(task)
+        return json.dumps({"status": "Not found"})
+    else:
+        content = request.get_json()
+        print content
+
+@app.route('/searchEditTask', methods = ['POST'])
+def searchEditTask():
+    if not checkAdmin(request):
+        return redirect(url_for('admin'))
+    content = request.get_json()
+    taskID = content[dbutil.TASK_ID]
+    print taskID
+    task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
+    if task != None:
+        return json.dumps(task)
+    return json.dumps({"status": "Not found"})
+
+@app.route('/submitEditTask', methods = ['POST'])
+def submitEditTask():
+    if not checkAdmin(request):
+        return redirect(url_for('admin'))
+    content = request.get_json()
+    taskJson = content['task_json']
+    print taskJson
+    if taskJson == None:
+        return json.dumps(content)
+    taskID = taskJson[dbutil.TASK_ID]
+    print "$$$"
+    print taskID
+    print "$$$"
+    task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
+    if task != None:
+        dbutil.taskdb.remove({dbutil.TASK_ID: taskID})
+        dbutil.taskdb.insert(taskJson)
+        return json.dumps(dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False}))
     return json.dumps({"status": "Not found"})
 
 @app.route('/showAll')
@@ -373,15 +433,6 @@ def searchDB():
         sortedlist = sortedlist[0:200]
     return json.dumps(sortedlist)
 
-@app.route('/updateTask', methods=['GET','POST'])
-def updateTask():
-    if request.method == "POST":
-        #print request
-        content = request.get_json()
-        print content
-    else:
-        return render_template("updateTask.html")
-
 @app.route('/wizardUpdateTask', methods=['POST'])
 def wizardUpdateTask():
     user_name = request.cookies.get('UserName')
@@ -459,6 +510,7 @@ def initDb_v0():
         dbutil.restaurantdb.insert(res1)
         dbutil.restaurantdb.insert(res2)
         dbutil.restaurantdb.insert(res3)
+
 
 if __name__=="__main__":
     logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

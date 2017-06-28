@@ -11,10 +11,12 @@
 </head>
 <body>
 <div>
-    <p>{{ jsonStr }}</p>
+    <input type="text" id="taskId">
+    <button type="button" class="btn btn-primary" onclick="searchEditTask()">Search</button>
+    <button type="button" class="btn btn-primary" onclick="submitEditTask()">Update</button>
 </div>
 <div>
-    <input type="text">
+    <textarea id="taskJson" cols=100 rows=1000></textarea>
 </div>
 </body>
 </html>
