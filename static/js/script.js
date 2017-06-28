@@ -65,8 +65,14 @@ function searchEditTask() {
 };
 
 function submitEditTask() {
-    var taskJsonString = $('#taskJson').val()
-    var taskJson = JSON.parse(taskJsonString)
+    var taskJson;
+    try {
+        var taskJsonString = $('#taskJson').val()
+        taskJson = JSON.parse(taskJsonString)
+    } catch (e) {
+        alert("JSON format error")
+        return false;
+    }
     $.ajax({
         type: 'POST',
         url: "/submitEditTask",

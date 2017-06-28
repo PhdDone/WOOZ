@@ -144,7 +144,7 @@ def checkAdmin(request):
         return True
     return False
 
-@app.route('/editTask', methods = ['POST', 'GET'])
+@app.route('/editTask', methods = ['GET'])
 def editTask():
     if not checkAdmin(request):
         return redirect(url_for('admin'))
@@ -159,9 +159,6 @@ def editTask():
         if task != None:
             return json.dumps(task)
         return json.dumps({"status": "Not found"})
-    else:
-        content = request.get_json()
-        print content
 
 @app.route('/searchEditTask', methods = ['POST'])
 def searchEditTask():
@@ -169,7 +166,6 @@ def searchEditTask():
         return redirect(url_for('admin'))
     content = request.get_json()
     taskID = content[dbutil.TASK_ID]
-    print taskID
     task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
     if task != None:
         return json.dumps(task)
@@ -181,13 +177,9 @@ def submitEditTask():
         return redirect(url_for('admin'))
     content = request.get_json()
     taskJson = content['task_json']
-    print taskJson
     if taskJson == None:
         return json.dumps(content)
     taskID = taskJson[dbutil.TASK_ID]
-    print "$$$"
-    print taskID
-    print "$$$"
     task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskID}, {'_id': False})
     if task != None:
         dbutil.taskdb.remove({dbutil.TASK_ID: taskID})
@@ -265,7 +257,6 @@ def userUpdateTask():
         version = 0
         if "version" in content.keys():
             version = content['version']
-        print version
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
         if task[dbutil.STATUS] != dbutil.WU and task[dbutil.STATUS] != dbutil.UT:
             return  json.dumps({'status':'error','task_id': taskId, 'message': 'not a user task'})
