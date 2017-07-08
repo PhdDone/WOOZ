@@ -1,4 +1,4 @@
-#-*-coding:utf-8-*-
+# -*-coding:utf-8-*-
 from pymongo import MongoClient
 import datetime
 import glob
@@ -11,335 +11,309 @@ import codecs
 from pprint import pprint
 import re
 import os
+from random import randint
 
 client = MongoClient('mongodb://localhost:27017/')
 
 print os.environ.keys()
-#client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
-#if 'DB_PORT_27017_TCP_ADDR' in os.environ.keys():
+# client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
+# if 'DB_PORT_27017_TCP_ADDR' in os.environ.keys():
 
 restdb = client['restdb']
 
-taskdb = restdb.tasks
+hotelTaskdb = restdb.hotelTasks
+taskdb = hotelTaskdb
 restaurantdb = restdb.restaurant
 
-#Task related
+# Task related
 TASK_ID = "task_id"
-STATUS = "status"
-NAME = "name" #venueName
-PRICE_RANGE = "price_range"
-ADDRESS = "address"
-PHONE_NUMBER = "phone_number"
-FOOD_TYPE = "food_type"
-AREA_NAME = "area_name"
-USER_UTC = "user_utc" #string array
-USER_UTC_ANNOTATOR = "user_utc_annotator"
-SYS_UTC = "sys_utc" #string array
-DIA_STATE = "dia_state"  #string array
-LOOKING_FOR = "looking_for"
 USER_GOAL = "user_goal"
+STATUS = "status"
+CONTEXT_INFO = "context_info"
+CONTEXT_TYPE = "type"  # train, flight, hotel
+ANNOTATION = "annotation"
 
-#dialogue_stated related
-DS_FOOD_TYPE = "ds_food_type"
-DS_AREA = "ds_area"
-DS_PRICE_LOWER_BOUND = "ds_price_lower_bound"
-DS_PRICE_UPPER_BOUND = "ds_prece_upper_bound"
-
-DS_ASKING_FOOD_TYPE = "ds_asking_food_type"
-DS_ASKING_AREA = "ds_asking_area"
-DS_ASKING_PRICE = "ds_asking_price"
-DS_ASKING_SCORE = "ds_asking_score"
-
-DS_GOAL_LABELS = "goal_lables"
-DS_REQUEST_SLOTS = "request_slots"
-
+USER_RESPONSE = "user_response"
 DIA_ACT = "dia_act"
-SYS_DIA_ACT = "sys_dia_act"
-SYS_DIA_ACT_HELLO = "hello"
-SYS_DIA_ACT_BYE = "bye"
-SYS_DIA_ACT_REQUEST = "request"
-SYS_DIA_ACT_CONFIRM = "confirm"
-SYS_DIA_ACT_INFORM = "inform"
-SYS_DIA_ACT_RECOMMEND = "recommend"
-SYS_DIA_ACT_REPEAT = "repeat"
-SYS_DIA_ANNOTATOR = "sys_dia_annotator"
+SLOT_INFO = "slot_info"
+SLOT_NAME = "slot_name"
+SLOT_VALUE = "slot_value"
 
-#TASK_SCHEMA = [STATUS, TASK_ID, NAME, PRICE_RANGE, ADDRESS, PHONE_NUMBER, FOOD_TYPE, AREA_NAME, USER_UTC, SYS_UTC, DIA_STATE]
-TASK_SCHEMA = [STATUS, TASK_ID, USER_UTC, SYS_UTC, DIA_STATE, DIA_ACT, USER_GOAL, USER_UTC_ANNOTATOR]
+TIME_STAMP = "time_stamp"
+VERSION = "version"
+ANNOTATOR = "annotator"
 
-#Task status
+TASK_SCHEMA = [STATUS, TASK_ID, USER_GOAL, ANNOTATION]
+
+# Task status
 NT = "newTask"
 UT = "userTask"
 WU = "waitForUserHit"
-WT = "wizardTask"
-WW = "waitForWizardHit"
-FT = "finish"
 
-#Restaurant related
-CITY = "city"
-#NAME = "name" #same from task
-AREA = "area"
-RATING_NUM = "rating_num"
-PRICE = "price"
-URL = "url"
-SCORE = "score"
-LNG = "lng"
-LAT = "lat"
-COOK = "cook" #["g114", "韩国料理"]
-ID = "id"
-ADDRESS = "address"
-RATING_NUM = "rating_num"
-AREA_NAME = "area_name"
+ANNOTATION_SCHEMA = [USER_RESPONSE, TIME_STAMP, VERSION, ANNOTATOR]
 
-RESTAURANT_SCHEMA = [CITY, NAME, RATING_NUM, PRICE, URL, SCORE, LNG, LAT, COOK, ID, ADDRESS, AREA, AREA_NAME, FOOD_TYPE]
+SLOT_INFO_SCHEMA = [SLOT_NAME, SLOT_VALUE]
 
-DIA_ACT = "dia_act"
-#{"dia_act" : [{"sys_dia_act": "hello": "sys_utc": "hello world"}]}
-SYS_DIA_ACT = "sys_dia_act"
-SYS_DIA_ACT_HELLO = "hello"
-SYS_DIA_ACT_BYE = "bye"
-SYS_DIA_ACT_REQUEST = "request"
-SYS_DIA_ACT_CONFIRM = "confirm"
-SYS_DIA_ACT_INFORM = "inform"
-SYS_DIA_ACT_RECOMMEND = "recommend"
-SYS_DIA_ACT_REPEAT = "repeat"
+final_flight_data = []
+final_hotel_data = []
+final_train_data = []
 
-SYS_SLOT_INFO = "sys_slot_info"
+flight_goal = ["request_flight_num"]
+train_goal = ["request_flight_num"]
 
-TIME_STAMP = "time_stamp"
-VERTION = "version"
-
-def resetTask(taskID):
-    oldTask = list(taskdb.find({TASK_ID: taskID}))[0]
-    user_goal = oldTask[USER_GOAL]
-    task = {TASK_ID: str(taskID), STATUS: 'userTask', SYS_UTC:["Sys: 欢迎! 您可以根据菜系，价格和区域查找餐厅"], USER_GOAL: user_goal}
-    insertTask(task)
+def createOneAnnotation(rawAnnotation, version, annotator):
+    res = {}
+    res[USER_RESPONSE] = rawAnnotation
+    res[VERSION] = version
+    res[ANNOTATOR] = annotator
+    res[TIME_STAMP] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return res
 
 def checkTask(task):
     for key in TASK_SCHEMA:
         if key not in task.keys():
-            #TODO: check task_id
+            # TODO: check task_id
             print "{} not in task: {}".format(key, task[TASK_ID])
-            if key == USER_UTC or key == SYS_UTC or key == DIA_STATE or key == AREA or key == DIA_ACT or key == USER_UTC_ANNOTATOR:
+            if key == ANNOTATION:
                 task[key] = []
-                continue
-            task[key] = "*"
+            else:
+                task[key] = "*"
     return task
 
-def checkRestaurant(restaurant):
-    for key in RESTAURANT_SCHEMA:
-        if key not in restaurant.keys():
-            #print "{} not in task: {}".format(key, restaurant[ID])
-            if key == COOK or key == AREA:
-                restaurant[key] = []
-                continue
-            restaurant[key] = "*"
-    if len(restaurant[COOK]) >= 2:
-        restaurant[FOOD_TYPE] = restaurant[COOK][1]
-    if len(restaurant[AREA]) >= 2:
-        restaurant[AREA_NAME] = restaurant[AREA][1]
-    return restaurant
+
+def checkAnnotation(annotation):
+    for key in ANNOTATION_SCHEMA:
+        if key not in annotation.keys():
+            if key == SLOT_INFO:
+                annotation[key] = []
+            else:
+                annotation[key] = "*"
+    return annotation
+
 
 def insertTask(task):
     task = checkTask(task)
     _id = taskdb.insert(task)
     return _id
 
-def dropTaskDB():
-    taskdb.drop()
 
-def dropRestaurantDB():
-    restaurantdb.drop()
+def insertAnnotation(task, annotation):
+    annotation = checkAnnotation(annotation)
+    task[ANNOTATION].append(annotation)
 
-def resetWUtoUT():
-    WU_tasks = list(taskdb.find({STATUS : WU}))
-    taskdb.remove({"status": WU})
-    for t in WU_tasks:
-        t[STATUS] = UT
-        insertTask(t)
 
-def resetWWtoWT():
-    WW_tasks = list(taskdb.find({STATUS : WW}))
-    res = taskdb.remove({STATUS: WW})
-    for t in WW_tasks:
-        t[STATUS] = WT
-        insertTask(t)
-
-def init():
-    dropTaskDB()
-
-    task1 = {TASK_ID:'123', STATUS: 'userTask', SYS_UTC:["Sys: 欢迎! 您可以根据菜系，价格和区域查找餐厅"], FOOD_TYPE: "川菜", AREA_NAME: "中关村", LOOKING_FOR: ADDRESS}
-#Task2 example: find a  resturant near beiyou.
-    task2 = {TASK_ID:'124', STATUS: 'userTask', SYS_UTC:["Sys: 欢迎! 您可以根据菜系，价格和区域查找餐厅"], PRICE_RANGE: "50以上", LOOKING_FOR: SCORE}
-
+def testInit():
+    task1 = {TASK_ID: '1', USER_GOAL: {DIA_ACT: DIA_ACT_REQ_ALT, SLOT_NAME: "from"}, STATUS: 'userTask', CONTEXT_INFO: [{"from": "Beijing", "to": "Haikou"},{"from": "Beijing", "to":"Shijiazhuang"}], ANNOTATION: []}
+    task2 = {TASK_ID: '2', USER_GOAL: {DIA_ACT: DIA_ACT_REQ_ALT, SLOT_NAME: "from"}, STATUS: 'userTask', CONTEXT_INFO: [{"from": "Beijing", "to": "Haikou"},{"from": "Beijing", "to":"Shijiazhuang"}], ANNOTATION: []}
     insertTask(task1)
     insertTask(task2)
-    print taskdb.find_one({'taskId': '123'})
-    res1 = {'venueName': 'LaoSichuan', 'foodType': 'Sichuan', 'address': "zhongguancun", 'phone': "110"}
-    res2 = {'venueName': 'Shaxianxiaochi', 'foodType': 'shaxian', 'address': "Xi tu cheng no. 10", 'phone': "911"}
-    res3 = {'venueName': 'LaoSichuan', 'foodType': 'Sichuan', 'address': "xiyatu", 'phone': "001"}
-    #restaurantdb.insert(res1)
-    #restaurantdb.insert(res2)
-    #restaurantdb.insert(res3)
+    print hotelTaskdb.find_one({TASK_ID: '1'})
+    print hotelTaskdb.count()
+
+def dropHotelTaskDB():
+    hotelTaskdb.drop()
 
 def loadRestaurantData():
     dropRestaurantDB()
     FILE = "./data/beijing_rest.json"
     data = []
-    with codecs.open(FILE,'rU','utf-8') as f:
+    with codecs.open(FILE, 'rU', 'utf-8') as f:
         for line in f:
             data.append(json.loads(line))
     for restaurant in data:
         res = checkRestaurant(restaurant)
         restaurantdb.insert(res)
 
-def getAllFoodType():
-    from sets import Set
+def loadHotelUserGoals():
+    FILE = "./data/hotelUserGoal.txt"
+    data = []
+    with codecs.open(FILE, 'rU', 'utf-8') as f:
+        for line in f:
+            data.append(json.loads(line))
+    return data
 
-    foodTypesAll = list(restaurantdb.find({},{FOOD_TYPE:1, "_id":0}))
-    foodTypes = Set()
+def createHotelTasks():
+    dropHotelTaskDB()
+    taskId = 0;
+    userGoals = loadHotelUserGoals()
+    for userGoal in userGoals:
+        newTask = {TASK_ID: str(taskId),
+                   USER_GOAL: userGoal,
+                   ANNOTATION: []}
+        hotelTaskdb.insert(newTask)
+        taskId += 1
 
-    for x in foodTypesAll:
-        foodTypes.add(x[FOOD_TYPE])
+def loadHotelData():
+    basePath = "/Users/yuanzhedong/Documents/mobvoi/smp2017/data/Task2data/hotel"
+    for filename in os.listdir(basePath):
+        with codecs.open(basePath + "/" + filename, 'rU', 'utf-8') as f:
+            for line in f:
+                final_hotel_data.append(json.loads(line))
+    print len(final_hotel_data)
+    print final_hotel_data[0]
 
-    for x in foodTypes:
-        print "<option>" + x + "</option>"
 
-def getAllAreaName():
-    from sets import Set
+def loadFlightData():
+    basePath = "/Users/yuanzhedong/Documents/mobvoi/smp2017/data/Task2data/flight"
+    flight_data = []
+    for filename in os.listdir(basePath):
+        data_file = open(basePath + "/" + filename, 'r')
+        for line in data_file.readlines():
+            json_data = line.strip()
+            data = json.loads(json_data)
+            flight_data.append(data)
+    for i in range(0, len(flight_data)):
+        for j in range(0, len(flight_data[i])):
+            final_flight_data.append(flight_data[i][j])
+    print len(final_flight_data)
+    print final_flight_data[0]
 
-    foodTypesAll = list(restaurantdb.find({},{AREA_NAME:1, "_id":0}))
-    foodTypes = Set()
 
-    for x in foodTypesAll:
-        foodTypes.add(x[AREA_NAME])
+def loadTrainData():
+    basePath = "/Users/yuanzhedong/Documents/mobvoi/smp2017/data/Task2data/train"
+    train_data = []
+    for filename in os.listdir(basePath):
+        data_file = open(basePath + "/" + filename, 'r')
+        for line in data_file.readlines():
+            json_data = line.strip()
+            data = json.loads(json_data)
+            train_data.append(data)
+    for i in range(0, len(train_data)):
+        for j in range(0, len(train_data[i])):
+            final_train_data.append(train_data[i][j])
+    print len(final_train_data)
+    print final_train_data[0]
 
-    for x in foodTypes:
-        print "<option>" + x + "</option>"
 
-def testSearchDB():
-    res = list(restaurantdb.find({AREA_NAME : {'$regex' : '.*' + '三元桥' + '.*'}}))
-    for x in res:
-        print x[AREA_NAME]
+'''
+Take slot and dialogue_act and generate goals
+'''
 
-def loadTask():
-    dropTaskDB()
+def generate_goal():
+    return None
+def generate_task_json():
+    '''
+    load db (done)
+    load goal
+    print json file
+    :return:
+    '''
+    return None
 
-    import re
-    p = re.compile('\{(.*?)\}')
-    File = "./data/sampled.task.smoothed.500"
-    file = open(File, "r")
-    taskID = 1
-    for line in file.readlines():
-        user_goal = line.split("。")[0]
-        lookFor = line.split("。")[-1]
-        res = p.findall(lookFor)
-        task = {TASK_ID: str(taskID), STATUS: NT, SYS_UTC:["Sys: 欢迎! 您可以根据菜系，价格和区域查找餐厅"], USER_GOAL: user_goal + "。" + lookFor}
-        insertTask(task)
-        taskID += 1
-        print taskdb.find_one({'taskId': '123'})
-        #print res[0]
 
-def isValidKey(key):
-    if len(key) == 0:
-        return False
-    if "不限" not in key:
-        return True
-    return False
+hotelSample = {u'city': u'\u897f\u5b89', u'name': u'\u4e34\u6f7c\u4e1c\u6d77\u62db\u5f85\u6240',
+               u'gpsLat': 34.38636717523, u'price': u'0', u'gpsLng': 109.229480385021,
+               u'address': u'\u94f6\u6865\u5927\u905356\u53f72\u697c(\u4ea4\u8b66\u5927\u961f\u5357\u90bb)'}
+trainSample = {u'terminalStation': u'\u5317\u4eac\u5357', u'originStation': u'\u4e0a\u6d77',
+               u'price': [{u'name': u'\u4e8c\u7b49\u5ea7', u'value': u'309'},
+                          {u'name': u'\u8f6f\u5367', u'value': u'693'}], u'trainNo': u'D322',
+               u'trainType': u'\u52a8\u8f66', u'startTime': u'2017-04-18 19:53', u'arrivalTime': u'2017-04-19 07:45',
+               u'runTime': u'11\u5c0f\u65f652\u5206'}
+flight = {u'departCity': u'\u5317\u4eac', u'standardPrice': u'1640.0000', u'flight': u'SC1437',
+          u'aPort': u'\u6c5f\u5317\u56fd\u9645\u673a\u573a', u'takeOffTime': u'2017-04-18 07:00:00', u'price': u'1200',
+          u'arriveCity': u'\u91cd\u5e86', u'arriveTime': u'2017-04-18 09:55:00', u'rate': u'0.73',
+          u'airline': u'\u5c71\u4e1c\u822a\u7a7a\u80a1\u4efd\u6709\u9650\u516c\u53f8',
+          u'dPort': u'\u9996\u90fd\u56fd\u9645\u673a\u573a', u'cabinInfo': u'\u7ecf\u6d4e\u8231', u'quantity': u'10'}
 
-def buildSearchKey(keyList):
-    price = keyList[0]
-    foodType = keyList[1]
-    area = keyList[2]
-    priceLowerBound = -1
-    priceUpperBound = -1
-    if "高于" in price:
-        priceLowerBound = int(re.findall(r'\d+', price)[0])
-        priceUpperBound = 9999999
-        print priceLowerBound
-    if "低于" in price:
-        priceUpperBound = int(re.findall(r'\d+', price)[0])
-        priceLowerBound = 0
-        print priceUpperBound
-    if "约" in price:
-        center = int(re.findall(r'\d+', price)[0])
-        priceLowerBound = center - 5
-        if priceLowerBound < -1:
-            priceLowerBound = 0
-        priceUpperBound = center + 5
+#Dialogue acts bind with slot
+DIA_ACT_INFORM = "inform" #帮我找个北京的酒店
+DIA_ACT_REQEST = "request" #这家酒店叫什么, 航班号是多少
+DIA_ACT_IMP_FILTER = "imp_filter" #太贵了，有没有便宜的
+DIA_ACT_SELECT_WITH_SLOT = "select_with_slot" #选7：00到的那一班火车吧
 
-    #build search key
-    key = {}
-    if isValidKey(area):
-        key[AREA_NAME] = {'$regex': '.*' + area + '.*'}
-    if isValidKey(foodType):
-        key[FOOD_TYPE] = foodType
-    if priceLowerBound > -1:
-        key[PRICE] = {'$gt':  priceLowerBound, '$lt': priceUpperBound}
-    print key
-    results = list(restaurantdb.find(key))
-    return len(results)
+#Dialogue acts bind with slot and context
+DIA_ACT_REQ_WITH_SELECT = "req_with_select" #第二个票价是多少，7：30那个
 
-def buildQueryKey():
-    lenDist = {}
-    import re
-    p = re.compile('{(.*?)}')
-    File = "./data/sampled.task.smoothed.500"
-    file = open(File, "r")
-    idx = 0
-    for line in file.readlines():
-        user_goal = line
-        goal_change = ""
-        constraint = line.split("。")[0]
-        if len(line.split("。")) == 3:
-            goal_change = line.split("。")[1]
-        print constraint
-        res = p.findall(constraint)
-        resLen = buildSearchKey(res)
-        #if resLen == 0 && len(goal_change) != 0:
-        #    if "地点" in goal_change:
-        #        res[2] = p.findall(goal_change)[0]
-        #    if "菜试" in goal_change:
-        #        res[1] = p.findall(goal_change)[1]
+#General Dialogue acts bind with any slot
+DIA_ACT_DONT_CARE = "dont_care"
+DIA_ACT_AFFERM = "affirm"
+DIA_ACT_REJECT = "reject"
 
-        if resLen in lenDist:
-            lenDist[resLen].append(idx)
-        else:
-            lenDist[resLen] = [idx]
-        idx += 1
-    keys = lenDist.keys()
-    print lenDist[0]
-    sorted(keys)
-    for k in keys:
-        print k, len(lenDist[k])
+#act with no slot
+DIA_ACT_SELECT = "select"
+DIA_ACT_REQ_ALT = "req_alt"
 
-def chooseByColum(col):
-    resAll = list(restaurantdb.find({},{col:1, "_id":0}))
+'''
+Request_alternatives （有别的吗，。。）
+Affirm/Reject (嗯，可以，不行)
+Dont_care （随便，无所谓）
+Selection
+'''
 
-    used = []
-    for r in resAll:
-        if r[col] not in used:
-            print r[col], len(list(restaurantdb.find(r)))
-            used.append(r[col])
 
-def haveUserTask():
-    UT_tasks = list(taskdb.find({STATUS : UT}))
-    return len(UT_tasks) > 0
+hotelConfig = {
+    "name": [DIA_ACT_INFORM, DIA_ACT_REQEST],
+    "city": [DIA_ACT_INFORM],
+    "address": [DIA_ACT_REQEST],
+    "price": [DIA_ACT_INFORM, DIA_ACT_REQEST, DIA_ACT_IMP_FILTER],
+}
 
-def haveWizardTask():
-    WT_tasks = list(taskdb.find({STATUS : WT}))
-    return len(WT_tasks) > 0
+def GenerateHotelUserGoal():
+    goals = []
+    for slotName in hotelConfig.keys():
+        for diaAct in hotelConfig[slotName]:
+            goal = {}
+            goal[DIA_ACT] = diaAct
+            goal[slotName] = slotName
+            goals.append(goal)
 
-if __name__=="__main__":
-    #init()
+trainConfig = {
+    "terminalStation": [DIA_ACT_INFORM],
+    "startTime": [DIA_ACT_INFORM],
+    "originStation": [DIA_ACT_INFORM],
+    "price": [DIA_ACT_INFORM],
+    "arrivalTime": [DIA_ACT_INFORM],
+    "trainNo": [DIA_ACT_INFORM],
+    "runTime": [DIA_ACT_INFORM],
+    "trainType": [DIA_ACT_INFORM],
+    "seatType": [DIA_ACT_INFORM]
+}
 
-    #loadRestaurantData()
-    #getAllFoodType()
-    #getAllAreaName()
-    #testSearchDB()
-    #logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    #loadTask()
-    buildQueryKey()
-    #resetWWtoWT()
-    #resetWUtoUT()
-    #chooseByColum(FOOD_TYPE)
+flightConfig = {
+    "aPort": [DIA_ACT_INFORM],
+    "standardPrice": [DIA_ACT_INFORM],
+    "flight": [DIA_ACT_INFORM],
+    "price": [DIA_ACT_INFORM],
+    "rate": [DIA_ACT_REQEST],
+    "dPort": [DIA_ACT_INFORM],
+    "departCity": [DIA_ACT_INFORM],
+    "takeOffTime": [DIA_ACT_INFORM],
+    "arriveTime": [DIA_ACT_INFORM],
+    "arriveCity": [DIA_ACT_INFORM],
+    "airline": [DIA_ACT_INFORM],
+    "cabinInfo": [DIA_ACT_INFORM],
+    "quantity": [DIA_ACT_INFORM]
+}
+
+
+def generate_user_goal():
+    for key in flight.keys():
+        print key
+
+def generateRandomTaskId(count):
+    taskId = randint(1, count)
+    return str(taskId)
+
+if __name__ == "__main__":
+    # init()
+
+    # loadRestaurantData()
+    # getAllFoodType()
+    # getAllAreaName()
+    # testSearchDB()
+    # logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    # loadTask()
+    # buildQueryKey()
+    # resetWWtoWT()
+    # resetWUtoUT()
+    # chooseByColum(FOOD_TYPE)
+    # loadFlightData()
+    # loadTrainData()
+    loadHotelData()
+    # generate_user_goal()
+    # generate_user_goal()
+    # testInit()
+    # for i in range(0, 20):
+    #   print generateRandomTaskId(10)
+    #generateHotelUserGoal
+    createHotelTasks()

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="static/js/script.js"></script>
+    <link href="static/css/signin.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <div class="highlight">
+        <h3>标注说明:</h3>
+        <ul>
+            <li>现在您需要模拟第二轮对话，即您已经和系统有了一轮交互，并得到了系统的初步反馈。。</li>
+            <li>Context栏中的信息只是系统返回的样例。您的标注不受样例取值的约束。例如即使context中没有20元的结果，您也可以说"就订20元的那个吧"，</li>
+        </ul>
+    </div>
+
+    <h3>Task <i id="taskId">{{ taskId }}</i></h3>
+
+    <div class="user-goal">
+        <h4>User Goal:</h4>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p> {{ userGoalString }} </p>
+            </div>
+        </div>
+    </div>
+
+    {% if contextInfoStrings|length == 0 %}
+        <div class="context" style="display: none">
+    {% else %}
+        <div class="context">
+    {% endif %}
+        <h4>Context:</h4>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% for item in contextInfoStrings %}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <form>
+        <div class="form-group">
+            <label for="userResponse">Your Response:</label>
+            <textarea class="form-control" id="userResponse" rows="3"></textarea>
+        </div>
+        <button type="submit" id="userSubmit" class="btn btn-primary" onclick="submitHit()">Submit</button>
+    </form>
+</body>
+</html>
