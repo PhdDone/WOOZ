@@ -46,7 +46,7 @@ def setcookie():
             resp.set_cookie('Password', password)
             resp.set_cookie('UserName', user)
         else:
-            resp = redirect(url_for("newTask"))
+            resp = redirect(url_for("newRandomTask"))
             resp.set_cookie('UserName', user)
         return resp
 
@@ -68,7 +68,7 @@ def login():
         #    raise ValueError("Invalid username or password supplied")
 
         # Note we don't *return* the response immediately
-        response = redirect(url_for("newTask"))
+        response = redirect(url_for("newRandomTask"))
         response.set_cookie('UserName', user_name)
         return response
     else:
