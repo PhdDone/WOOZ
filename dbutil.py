@@ -291,7 +291,7 @@ def generate_user_goal():
         print key
 
 def generateRandomTaskId(count):
-    taskId = randint(1, count)
+    taskId = randint(0, count-1)
     return str(taskId)
 
 if __name__ == "__main__":
