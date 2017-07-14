@@ -80,7 +80,6 @@ def checkTask(task):
                 task[key] = "*"
     return task
 
-
 def checkAnnotation(annotation):
     for key in ANNOTATION_SCHEMA:
         if key not in annotation.keys():
@@ -125,7 +124,8 @@ def loadRestaurantData():
         restaurantdb.insert(res)
 
 def loadHotelUserGoals():
-    FILE = "./data/hotelUserGoal.txt"
+    #FILE = "./data/hotelUserGoal.txt"
+    FILE = "./data/edct2UserGoal.json"
     data = []
     with codecs.open(FILE, 'rU', 'utf-8') as f:
         for line in f:
@@ -166,7 +166,12 @@ def loadFlightData():
         for j in range(0, len(flight_data[i])):
             final_flight_data.append(flight_data[i][j])
     print len(final_flight_data)
-    print final_flight_data[0]
+    #to terminal
+    #print json.dumps(final_flight_data[0], ensure_ascii=False).encode('utf-8').decode('utf-8')
+
+    #print to file
+    for i in range(0, 10):
+        print json.dumps(final_flight_data[i], ensure_ascii=False).encode('utf-8')
 
 
 def loadTrainData():
@@ -182,7 +187,8 @@ def loadTrainData():
         for j in range(0, len(train_data[i])):
             final_train_data.append(train_data[i][j])
     print len(final_train_data)
-    print final_train_data[0]
+    for i in range(0, 10):
+        print json.dumps(final_train_data[i], ensure_ascii=False).encode('utf-8')
 
 
 '''
@@ -307,13 +313,13 @@ if __name__ == "__main__":
     # resetWWtoWT()
     # resetWUtoUT()
     # chooseByColum(FOOD_TYPE)
-    # loadFlightData()
-    # loadTrainData()
-    loadHotelData()
+    #loadFlightData()
+     loadTrainData()
+    #loadHotelData()
     # generate_user_goal()
     # generate_user_goal()
     # testInit()
     # for i in range(0, 20):
     #   print generateRandomTaskId(10)
     #generateHotelUserGoal
-    createHotelTasks()
+    #createHotelTasks()
