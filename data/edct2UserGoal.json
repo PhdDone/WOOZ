@@ -35,7 +35,6 @@
 {"dia_act": "yes", "slot": "地址/address", "domain": "宾馆/hotel", "user_goal_raw": "系统向您确认{地址/address}的取值，您需要肯定系统指定{宾馆/hotel}的{地址/address}"}
 {"dia_act": "yes", "slot": "城市/city", "domain": "宾馆/hotel", "user_goal_raw": "系统向您确认{城市/city}的取值，您需要肯定系统指定{宾馆/hotel}的{城市/city}"}
 {"dia_act": "request", "slot": "价格/price", "domain": "宾馆/hotel", "user_goal_raw": "系统为您找到了一个{宾馆/hotel}, 您需要询问该{宾馆/hotel}的{价格/price}"}
-{"dia_act": "request", "slot": "城市/city", "domain": "宾馆/hotel", "user_goal_raw": "系统为您找到了一个{宾馆/hotel}, 您需要询问该{宾馆/hotel}的{城市/city}"}
 {"dia_act": "request", "slot": "名称/name", "domain": "宾馆/hotel", "user_goal_raw": "系统为您找到了一个{宾馆/hotel}, 您需要询问该{宾馆/hotel}的{名称/name}"}
 {"dia_act": "request", "slot": "地址/address", "domain": "宾馆/hotel", "user_goal_raw": "系统为您找到了一个{宾馆/hotel}, 您需要询问该{宾馆/hotel}的{地址/address}"}
 {"dia_act": "inform_add_constrain", "slot": "城市/city", "domain": "宾馆/hotel", "user_goal_raw": "您已经告知了系统您对{宾馆/hotel}的部分属性的需求，现在您想告知系统关于您对{宾馆/hotel}的{城市/city}的需求"}
