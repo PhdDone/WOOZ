@@ -12,6 +12,7 @@ from pprint import pprint
 import re
 import os
 from random import randint
+import random
 
 client = MongoClient('mongodb://localhost:27017/')
 
@@ -173,7 +174,6 @@ def loadFlightData():
     for i in range(0, 10):
         print json.dumps(final_flight_data[i], ensure_ascii=False).encode('utf-8')
 
-
 def loadTrainData():
     basePath = "/Users/yuanzhedong/Documents/mobvoi/smp2017/data/Task2data/train"
     train_data = []
@@ -186,10 +186,21 @@ def loadTrainData():
     for i in range(0, len(train_data)):
         for j in range(0, len(train_data[i])):
             final_train_data.append(train_data[i][j])
-    print len(final_train_data)
-    for i in range(0, 10):
-        print json.dumps(final_train_data[i], ensure_ascii=False).encode('utf-8')
+    #print len(final_train_data)
 
+    contexts = []
+    idxs = random.sample(range(1, len(final_train_data)), 50)
+    for idx in idxs:
+        if idx < 1 or idx == len(final_train_data) - 1: continue
+        else:
+            print json.dumps(final_train_data[idx-1], ensure_ascii=False).encode('utf-8')
+            print json.dumps(final_train_data[idx], ensure_ascii=False).encode('utf-8')
+            print json.dumps(final_train_data[idx+1], ensure_ascii=False).encode('utf-8')
+
+    #for i in range(0, len(final_train_data)):
+        #print json.dumps(final_train_data[i], ensure_ascii=False).encode('utf-8')
+    #50 context lists
+    #generateTrainContext()
 
 '''
 Take slot and dialogue_act and generate goals
@@ -303,7 +314,7 @@ def generateRandomTaskId(count):
 if __name__ == "__main__":
     # init()
 
-    # loadRestaurantData()
+    #loadRestaurantData()
     # getAllFoodType()
     # getAllAreaName()
     # testSearchDB()
@@ -314,7 +325,7 @@ if __name__ == "__main__":
     # resetWUtoUT()
     # chooseByColum(FOOD_TYPE)
     #loadFlightData()
-     loadTrainData()
+    loadTrainData()
     #loadHotelData()
     # generate_user_goal()
     # generate_user_goal()
