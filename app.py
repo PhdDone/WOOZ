@@ -174,10 +174,12 @@ def userUpdateTask():
         content = request.get_json()
         taskId = content[dbutil.TASK_ID]
         rawAnnotation = content['annotation']
+        rawContext = content['context']
+        print rawContext
         version = 0
         if "version" in content.keys():
             version = content['version']
-        annotation = dbutil.createOneAnnotation(rawAnnotation, version, user_name)
+        annotation = dbutil.createOneAnnotation(rawAnnotation, version, user_name, rawContext)
         task = dbutil.taskdb.find_one({dbutil.TASK_ID: taskId})
         task[dbutil.ANNOTATION].append(annotation)
         dbutil.taskdb.remove({dbutil.TASK_ID: taskId})
@@ -194,6 +196,13 @@ def buildContextInfoString(contextInfo):
 def buildUserGoalString(userGoal):
     return userGoal["user_goal_raw"]
 
+def getRandomContext(domain):
+    if "hotel" in domain:
+        return hotelContext[dbutil.generateRandomInt(len(hotelContext))]
+    if "flight" in domain:
+        return flightContext[dbutil.generateRandomInt(len(flightContext))]
+    if "train" in domain:
+        return trainContext[dbutil.generateRandomInt(len(trainContext))]
 @app.route('/newRandomTask')
 def newRandomTask():
     user_name = request.cookies.get('UserName')
@@ -210,7 +219,9 @@ def newRandomTask():
     taskId = task[dbutil.TASK_ID]
     contextInfo = []
     if dbutil.CONTEXT_INFO in task[dbutil.USER_GOAL].keys():
-        contextInfo = task[dbutil.USER_GOAL][dbutil.CONTEXT_INFO]
+        print task
+        #contextInfo = task[dbutil.USER_GOAL][dbutil.CONTEXT_INFO]
+        contextInfo = getRandomContext(task[dbutil.USER_GOAL]["domain"])
     userGoal = task[dbutil.USER_GOAL]
     contextInfoStrings = buildContextInfoString(contextInfo)
     userGoalString = buildUserGoalString(userGoal)
@@ -221,6 +232,10 @@ def newRandomTask():
         displayContext = "visibility: hidden"
     return render_template('task.html', taskId=taskId, contextInfoStrings = contextInfoStrings, userGoalString = userGoalString, displayContext = displayContext)
 
+hotelContext = []
+flightContext = []
+trainContext = []
+
 if __name__=="__main__":
     logging.basicConfig(filename='app.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     handler = RotatingFileHandler('foo.log', maxBytes=1000000000, backupCount=10)
@@ -229,5 +244,8 @@ if __name__=="__main__":
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     dbutil.createHotelTasks()
+    hotelContext = dbutil.loadContextInfo("./data/hotel_context.json")
+    flightContext = dbutil.loadContextInfo("./data/flight_context.json")
+    trainContext = dbutil.loadContextInfo("./data/train_context.json")
     #dbutil.loadRestaurantData()
     app.run(host='0.0.0.0', port=9009, debug=True)

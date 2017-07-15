@@ -18,13 +18,16 @@ function submitHit() {
     $('#userSubmit').hide()
     var taskId = $('#taskId').text();
     var userResponse = $('#userResponse').val();
+    var context = $('#context').html().replace(/(\r\n|\n|\r| |<|>)/gm,"");
+    var context = context.replace(/(")/gm,"|");
     $.ajax({
         type: 'POST',
         url: "/userUpdateTask",
         data: JSON.stringify({
             "task_id": taskId,
             "annotation": userResponse,
-            "version": version
+            "version": version,
+            "context": context
         }),
         error: function (e) {
             console.log(e);

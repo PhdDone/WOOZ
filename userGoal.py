@@ -141,6 +141,7 @@ def fillTemplate(dia_act, template, domain, slots, contextInfo):
                     tmp = re.sub(r"slot_0", slot_0, template2)
                     user_goal_raw= re.sub(r"slot_1", slot_1, tmp)
                     user_goal = {dbutil.DIA_ACT : dia_act,
+                                 "domain": domain,
                                  "user_goal_raw": user_goal_raw,
                                  "slot_0": slot_0,
                                  "slot_1": slot_1}

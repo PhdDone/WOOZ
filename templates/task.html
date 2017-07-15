@@ -16,8 +16,8 @@
     <div class="highlight">
         <h3>标注说明:</h3>
         <ul>
-            <li>现在您需要模拟第二轮对话，即您已经和系统有了一轮交互，并得到了系统的初步反馈。。</li>
-            <li>Context栏中的信息只是模拟系统返回的样例。您的标注不受样例取值的约束。例如即使context中没有20元的结果，您也可以说"就订20元的那个吧"，</li>
+            <li>现在您需要模拟第二轮对话，即您已经和系统有了一轮交互，并得到了系统的初步反馈。</li>
+            <li>Context栏中的信息只是随机模拟三个系统返回结果帮助您理解。标注时您可以想象五个甚至更多个返回结果场景。</li>
         </ul>
     </div>
 
@@ -33,9 +33,9 @@
     </div>
 
     {% if contextInfoStrings|length == 0 %}
-        <div class="context" style="display: none">
+        <div id="context" style="display: none">
     {% else %}
-        <div class="context">
+        <div id="context">
     {% endif %}
         <h4>Context:</h4>
         <div class="panel panel-default">
@@ -45,6 +45,7 @@
                 {% endfor %}
             </div>
         </div>
+
     </div>
 
     <form>

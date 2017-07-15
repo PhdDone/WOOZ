@@ -43,6 +43,7 @@ SLOT_VALUE = "slot_value"
 TIME_STAMP = "time_stamp"
 VERSION = "version"
 ANNOTATOR = "annotator"
+CONTEXT = "context"
 
 TASK_SCHEMA = [STATUS, TASK_ID, USER_GOAL, ANNOTATION]
 
@@ -51,7 +52,7 @@ NT = "newTask"
 UT = "userTask"
 WU = "waitForUserHit"
 
-ANNOTATION_SCHEMA = [USER_RESPONSE, TIME_STAMP, VERSION, ANNOTATOR]
+ANNOTATION_SCHEMA = [USER_RESPONSE, TIME_STAMP, VERSION, ANNOTATOR, CONTEXT]
 
 SLOT_INFO_SCHEMA = [SLOT_NAME, SLOT_VALUE]
 
@@ -62,12 +63,13 @@ final_train_data = []
 flight_goal = ["request_flight_num"]
 train_goal = ["request_flight_num"]
 
-def createOneAnnotation(rawAnnotation, version, annotator):
+def createOneAnnotation(rawAnnotation, version, annotator, context):
     res = {}
     res[USER_RESPONSE] = rawAnnotation
     res[VERSION] = version
     res[ANNOTATOR] = annotator
     res[TIME_STAMP] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    res[CONTEXT] = context
     return res
 
 def checkTask(task):
@@ -124,6 +126,20 @@ def loadRestaurantData():
         res = checkRestaurant(restaurant)
         restaurantdb.insert(res)
 
+#FILE = "./data/flight_context.json"
+def loadContextInfo(FILE):
+    data = []
+    with codecs.open(FILE, 'rU', 'utf-8') as f:
+        for line in f:
+            data.append(json.loads(line))
+    contexts = []
+    context = []
+    for i in range(0, len(data)):
+        context.append(data[i])
+        if len(context) == 3:
+            contexts.append(context)
+            context = []
+    return contexts
 def loadHotelUserGoals():
     #FILE = "./data/hotelUserGoal.txt"
     FILE = "./data/edct2UserGoal.json"
@@ -138,7 +154,9 @@ def createHotelTasks():
     taskId = 0;
     userGoals = loadHotelUserGoals()
     for userGoal in userGoals:
+        print userGoal
         newTask = {TASK_ID: str(taskId),
+                   "domain": userGoal[u"domain"],
                    USER_GOAL: userGoal,
                    ANNOTATION: []}
         hotelTaskdb.insert(newTask)
@@ -150,8 +168,18 @@ def loadHotelData():
         with codecs.open(basePath + "/" + filename, 'rU', 'utf-8') as f:
             for line in f:
                 final_hotel_data.append(json.loads(line))
-    print len(final_hotel_data)
-    print final_hotel_data[0]
+    sorted_hotel = sorted(final_hotel_data, key=lambda hotel: hotel["city"])
+
+    #for idx in range(2000, 5000):
+    #    print json.dumps(sorted_hotel[idx], ensure_ascii=False).encode('utf-8')
+
+    idxs = random.sample(range(2200, len(sorted_hotel)), 50)
+    for idx in idxs:
+        if idx < 1 or idx == len(sorted_hotel) - 1: continue
+        else:
+            print json.dumps(sorted_hotel[idx-1], ensure_ascii=False).encode('utf-8')
+            print json.dumps(sorted_hotel[idx], ensure_ascii=False).encode('utf-8')
+            print json.dumps(sorted_hotel[idx+1], ensure_ascii=False).encode('utf-8')
 
 
 def loadFlightData():
@@ -166,13 +194,14 @@ def loadFlightData():
     for i in range(0, len(flight_data)):
         for j in range(0, len(flight_data[i])):
             final_flight_data.append(flight_data[i][j])
-    print len(final_flight_data)
-    #to terminal
-    #print json.dumps(final_flight_data[0], ensure_ascii=False).encode('utf-8').decode('utf-8')
-
-    #print to file
-    for i in range(0, 10):
-        print json.dumps(final_flight_data[i], ensure_ascii=False).encode('utf-8')
+    contexts = []
+    idxs = random.sample(range(1, len(final_flight_data)), 50)
+    for idx in idxs:
+        if idx < 1 or idx == len(final_flight_data) - 1: continue
+        else:
+            print json.dumps(final_flight_data[idx-1], ensure_ascii=False).encode('utf-8')
+            print json.dumps(final_flight_data[idx], ensure_ascii=False).encode('utf-8')
+            print json.dumps(final_flight_data[idx+1], ensure_ascii=False).encode('utf-8')
 
 def loadTrainData():
     basePath = "/Users/yuanzhedong/Documents/mobvoi/smp2017/data/Task2data/train"
@@ -311,6 +340,8 @@ def generateRandomTaskId(count):
     taskId = randint(0, count-1)
     return str(taskId)
 
+def generateRandomInt(count):
+    return randint(0, count-1)
 if __name__ == "__main__":
     # init()
 
@@ -325,8 +356,8 @@ if __name__ == "__main__":
     # resetWUtoUT()
     # chooseByColum(FOOD_TYPE)
     #loadFlightData()
-    loadTrainData()
-    #loadHotelData()
+    #loadTrainData()
+    loadHotelData()
     # generate_user_goal()
     # generate_user_goal()
     # testInit()
